@@ -1,0 +1,44 @@
+{
+  "name": "local_community",
+  "version": "1.0.0",
+  "description": "web api for a local community to manage issues that arise",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.coventry.ac.uk/6003CEM/9753941_local_community_API_back_end.git"
+  },
+  "author": "Harman Singh",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "bcrypt": "^5.0.0",
+    "etag": "^1.8.1",
+    "fs": "0.0.1-security",
+    "jsdoc": "^4.0.2",
+    "jsonschema": "^1.2.11",
+    "koa": "^2.13.0",
+    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-mount": "^4.0.0",
+    "koa-passport": "^6.0.0",
+    "koa-router": "^9.4.0",
+    "koa-static": "^5.0.0",
+    "mime-types": "^2.1.29",
+    "passport-http": "^0.3.0",
+    "promise-mysql": "^4.1.3",
+    "role-acl": "^4.5.4",
+    "uuid": "^8.3.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "eslint": "^7.14.0",
+    "jest": "^26.6.3",
+    "supertest": "^6.0.1"
+  }
+}
