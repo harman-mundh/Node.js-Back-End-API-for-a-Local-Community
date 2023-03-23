@@ -129,4 +129,6 @@ dist
 .yarn/install-state.gz
 
 .next
+
+#ignore db info
 config.js
