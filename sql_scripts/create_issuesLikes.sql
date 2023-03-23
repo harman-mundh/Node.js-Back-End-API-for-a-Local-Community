@@ -1,7 +1,7 @@
-CREATE TABLE articleLikes (
-  articleID INT NOT NULL,
+CREATE TABLE issuesikes (
+  issueID INT NOT NULL,
   userID INT NOT NULL,
-  FOREIGN KEY (articleID) REFERENCES articles (ID) ON DELETE CASCADE,
+  FOREIGN KEY (issueID) REFERENCES issues (ID) ON DELETE CASCADE,
   FOREIGN KEY (userID) REFERENCES users (ID) ON DELETE CASCADE,
-  PRIMARY KEY (articleID, userID)
+  PRIMARY KEY (issueID, userID)
 );

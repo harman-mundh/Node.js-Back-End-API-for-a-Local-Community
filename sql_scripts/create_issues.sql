@@ -1,4 +1,4 @@
-CREATE TABLE articles (
+CREATE TABLE issues (
       ID INT NOT NULL AUTO_INCREMENT,  
       title VARCHAR(32) NOT NULL,  
       allText TEXT NOT NULL,

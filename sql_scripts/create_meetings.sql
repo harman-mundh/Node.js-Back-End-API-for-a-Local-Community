@@ -1,0 +1,11 @@
+CREATE TABLE meetings (
+  ID INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(32) NOT NULL,
+  allText TEXT NOT NULL,
+  location TEXT NOT NULL,
+  start_time DATETIME,
+  end_time DATETIME,
+  authorID INT NOT NULL,
+  dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
