@@ -1,8 +1,18 @@
+/**
+ * KOA router module for managing resources related to issues resources with HTTP methods.
+ * 
+ * @module issueRoutes
+ * @author Harman Singh
+ * @requires koa,koa-bodyparser
+ * @requires permissions/issues
+ * @requires models/{issues, issuesViews, issueCatergories, commets, likes} 
+ */
+
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const etag = require('etag');
 const model = require('../models/users');
-const auth = require('../controllers/auth');
+const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/users');
 const {validateUser, validateUserUpdate} = require('../controllers/validation');
 
@@ -17,6 +27,11 @@ router.put('/:id([0-9]{1,})', auth, bodyParser(), validateUserUpdate, updateUser
 router.del('/:id([0-9]{1,})', auth, deleteUser);
 router.get('/search', auth, emailSearch);
 
+/**
+ * Search for users by email address.
+ * @param {Object} ctx - Koa context object
+ * @param {Function} next - Koa next middleware
+ */
 async function emailSearch(ctx, next) {
   // TODO: this implementation is basic
   // you could add pagination, partial response, etc.
@@ -40,6 +55,10 @@ async function emailSearch(ctx, next) {
   }
 }
 
+/**
+ * Authenticate user and return login information.
+ * @param {Object} ctx - Koa context object
+ */
 async function login(ctx) {
   // return any details needed by the client
   const {ID, username, email, avatarURL} = ctx.state.user
@@ -49,6 +68,10 @@ async function login(ctx) {
   ctx.body = {ID, username, email, avatarURL, links};
 }
 
+/**
+ * Get all users with pagination and filtering by fields.
+ * @param {Object} ctx - Koa context object
+ */
 async function getAll(ctx) {
   const permission = can.readAll(ctx.state.user);
   if (!permission.granted) {
@@ -90,6 +113,11 @@ async function getAll(ctx) {
   }
 }
 
+/**
+ * Get a user by their ID.
+ * @param {Object} ctx - Koa context object
+ * @param {Function} next - Koa next middleware
+ */
 async function getById(ctx, next) {
   const id = ctx.params.id;
   const result = await model.getById(id);
@@ -125,6 +153,11 @@ async function getById(ctx, next) {
   }
 }
 
+
+/**
+ * Create a new user.
+ * @param {Object} ctx - Koa context object
+ */
 async function createUser(ctx) {
   const body = ctx.request.body;
   const result = await model.add(body);
@@ -135,6 +168,10 @@ async function createUser(ctx) {
   }
 }
 
+/**
+ * Update an existing user by their ID.
+ * @param {Object} ctx - Koa context object
+ */
 async function updateUser(ctx) {
   const id = ctx.params.id;
   let result = await model.getById(id);  // check it exists
@@ -155,6 +192,10 @@ async function updateUser(ctx) {
   }
 }
 
+/**
+ * Delete a user by their ID.
+ * @param {Object} ctx - Koa context object
+ */
 async function deleteUser(ctx) {
   const id = ctx.params.id;
   let result = await model.getById(id);

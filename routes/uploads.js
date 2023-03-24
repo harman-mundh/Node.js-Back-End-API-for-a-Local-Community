@@ -2,7 +2,7 @@ const { copyFileSync, existsSync, createReadStream } = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const mime = require('mime-types');
 const Router = require('koa-router');
-const auth = require('../controllers/auth');
+const auth = require('../controllers/authMiddleware');
 
 const upload_options = {
     multipart: true,
