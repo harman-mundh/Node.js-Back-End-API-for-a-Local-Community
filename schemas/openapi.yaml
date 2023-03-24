@@ -1,22 +1,22 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: Web API Development Back End Demonstration API
-  description: A simple blog API. Use the module worksheets to complete the code and API architecture!
+  title: Local Community Back End Demonstration API
+  description: A Local Community. Use the module worksheets to complete the code and API architecture!
   contact:
-    name: Colin Stephen
-    email: ab5169@coventry.ac.uk
+    name: Harman Singh
+    email: singhh48@coventry.ac.uk
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://ecology-fiction-3000.codio-box.uk/api/v1'
+  - url: 'https://outsidefilter-epoxyderby-8080.codio-box.uk/api/v1'
     description: Development server
 tags:
   - name: Users
     description: API endpoints for user management.
-  - name: Articles
-    description: Access and perform CRUD operations on blog entries.
+  - name: Issues
+    description: Access and perform CRUD operations on issues entries.
 paths:
   /users:
     summary: Represents an individual user

@@ -3,9 +3,10 @@ CREATE TABLE meetings (
   title VARCHAR(32) NOT NULL,
   allText TEXT NOT NULL,
   location TEXT NOT NULL,
-  start_time DATETIME,
-  end_time DATETIME,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
   authorID INT NOT NULL,
   dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (authorID) REFERENCES users (ID) ON DELETE CASCADE
 );

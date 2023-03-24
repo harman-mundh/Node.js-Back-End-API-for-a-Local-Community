@@ -4,7 +4,7 @@
       "category": {
         "$id": "/category",
         "title": "Category",
-        "description": "An article category",
+        "description": "An issue category",
         "type": "object",
         "properties": {
           "name": {
@@ -14,11 +14,6 @@
           "description": {
             "description": "More detail about the category",
             "type": "string"
-          },
-          "imageURL": {
-            "description": "URL of an image to represent the category",
-            "type": "string",
-            "format": "uri"
           }
         },
         "required": ["name"],

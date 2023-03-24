@@ -1,35 +1,35 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
-      "article": {
-        "id": "/article",
-        "title": "Article",
-        "description": "An article in the blog",
+      "issue": {
+        "id": "/issue",
+        "title": "issue",
+        "description": "An issue in the local community",
         "type": "object",
         "properties": {
           "title": {
-            "description": "Main title of the blog article",
+            "description": "Main title of the issue",
             "type": "string"
           },
           "allText": {
-            "description": "Body text of the blog article",
+            "description": "Body text of the issue",
             "type": "string"
           },
           "summary": {
-            "description": "Optional short text summary of article",
+            "description": "Optional short text summary of issue",
             "type": "string"
           },
           "imageURL": {
-            "description": "URL for main image to show in article",
+            "description": "URL for main image to show in issue",
             "type": "string",
             "format": "uri"
           },
           "published": {
-            "description": "Is the article published or not",
+            "description": "Is the issue published or not",
             "type": "boolean"
           },
           "authorID": {
-            "description": "User ID of the article author",
+            "description": "User ID of the issue author",
             "type": "integer",
             "minimum": 0
           }
