@@ -4,18 +4,26 @@ const app = new Koa();
 
 app.use(cors());
 
-const special = require('./routes/special.js')
-const articles = require('./routes/articles.js');
-const users = require('./routes/users.js');
-const categories = require('./routes/categories.js');
-const comments = require('./routes/comments.js');
-const uploads = require('./routes/uploads.js');
+//importing the routes
+const {router, router_v2} = require('./routes/special.js')
+// const issues = require('./routes/issues.js');
+// const users = require('./routes/users.js');
+// const categories = require('./routes/categories.js');
+// const comments = require('./routes/comments.js');
+// const uploads = require('./routes/uploads.js');
 
-app.use(special.routes());
-app.use(articles.routes());
-app.use(users.routes());
-app.use(categories.routes());
-app.use(comments.routes());
-app.use(uploads.routes());
+// using and allowing the routes
+app.use(router.routes());
+//app.use(router.allowedMethods());
+
+app.use(router_v2.routes());
+//app.use(router_v2.allowedMethods());
+
+// app.use(issues.routes());
+// app.use(users.routes());
+// app.use(categories.routes());
+// app.use(comments.routes());
+// app.use(uploads.routes());
+
 
 module.exports = app;
