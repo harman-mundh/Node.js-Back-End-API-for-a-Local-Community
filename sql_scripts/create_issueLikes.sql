@@ -1,4 +1,4 @@
-CREATE TABLE issuesikes (
+CREATE TABLE issueLikes (
   issueID INT NOT NULL,
   userID INT NOT NULL,
   FOREIGN KEY (issueID) REFERENCES issues (ID) ON DELETE CASCADE,

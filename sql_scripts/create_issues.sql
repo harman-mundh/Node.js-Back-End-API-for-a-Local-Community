@@ -8,7 +8,7 @@ CREATE TABLE issues (
       imageURL VARCHAR(2048),  
       published BOOL NOT NULL DEFAULT 0,
       authorID INT NOT NULL,
-      status ENUM('New', 'Work in progress', 'Solved') NOT NULL,
+      status ENUM('New', 'Work in progress', 'Solved') NOT NULL DEFAULT 'New',
       PRIMARY KEY (ID),
       FOREIGN KEY (authorID) REFERENCES users (ID) ON DELETE CASCADE
 );

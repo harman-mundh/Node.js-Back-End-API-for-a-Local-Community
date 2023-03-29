@@ -7,7 +7,7 @@
 
 const {Validator, ValidationError} = require('jsonschema');
 
-const articleSchema = require('../schemas/article.json').definitions.article;
+const issueSchema = require('../schemas/issue.json').definitions.article;
 const categorySchema = require('../schemas/category.json').definitions.category;
 const commentSchema = require('../schemas/comment.json').definitions.comment;
 const userSchema = require('../schemas/user.json').definitions.user;
@@ -56,8 +56,8 @@ const makeKoaValidator = (schema, resource) => {
   return handler;
 }
 
-/** Validate data against the article schema. */
-exports.validateArticle = makeKoaValidator(articleSchema, 'article');
+/** Validate data against the issue schema. */
+exports.validateissue = makeKoaValidator(issueSchema, 'issue');
 /** Validate data against the category schema. */
 exports.validateCategory = makeKoaValidator(categorySchema, 'category');
 /** Validate data against the comment schema. */

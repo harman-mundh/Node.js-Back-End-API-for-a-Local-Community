@@ -12,15 +12,16 @@ const jwt = require('jsonwebtoken');
 
 /**
  * Create a JWT token for the user.
+ * 
  * @param {Object} user - The user object.
- * @param {string} user._id - The user's ID.
+ * @param {string} user.id - The user's ID.
  * @param {string} user.email - The user's email.
  * @param {string} user.role - The user's role.
  * @returns {string} The generated JWT token.
  */
 exports.createToken = function createToken(user) {
   const userinfo = {
-    id: user._id,
+    id: user.id,
     email: user.email,
     role: user.role,
   };
@@ -43,7 +44,7 @@ exports.checkToken = async function checkToken(ctx, next) {
   const authHeader = ctx.request.header.authorization;
 
   if (!authHeader) {
-    ctx.throw(401, "No token");
+    ctx.throw(401, "No token Provided");
   }
 
   const token = authHeader.split(" ")[1];

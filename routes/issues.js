@@ -22,47 +22,47 @@ const comments = require('../models/comments');
 const likes = require('../models/likes');
 
 // validation schema
-const {validateissue, validateComment} = require('../controllers/validation'); 
+const {validateIssue, validateComment} = require('../controllers/validation'); 
 
 // URI endpoint to view the issues stored on db
 const Prefix = '/api/v1/issues'; 
 // const router = Router({prefix: Prefix});
 
 // issue routes
-router.get('/issues', getAll);
-router.post('/issues', auth, bodyParser(), validateissue, createissue); // posting data
-router.get('/issues/:id([0-9]{1,})', getById);
-router.put('/issues/:id([0-9]{1,})', auth, bodyParser(), validateissue, updateissue);
-router.del('/issues/:id([0-9]{1,})', auth, deleteissue); // validateissue = middleware
+router.get('/', getAll);
+router.post('/', auth, bodyParser(), validateIssue, createissue); // posting data
+router.get('/:id([0-9]{1,})', getById);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), validateIssue, updateIssue); // validateIssue = middleware
+router.put('/issues/:id/solve', auth, updateIssueStatus)
+router.del('/:id([0-9]{1,})', auth, deleteissue); 
 
 // likes routes
-router.get('/issues/:id([0-9]{1,})/likes', likesCount);
-router.post('/issues/:id([0-9]{1,})/likes', auth, likePost);
-router.del('/issues/:id([0-9]{1,})/likes', auth, dislikePost);
+router.get('/:id([0-9]{1,})/likes', likesCount);
+router.post('/:id([0-9]{1,})/likes', auth, likePost);
+router.del('/:id([0-9]{1,})/likes', auth, dislikePost);
 
 // views route
 router.get('/issues/:id([0-9]{1,})/views', getViewCount);
 
 // categories routes
-router.get('/issues/:id([0-9]{1,})/categories', getAllCategories);
-router.post('/issues/:id([0-9]{1,})/categories/:cid([0-9]{1,})', auth, addCategory);
-router.del('/issues/:id([0-9]{1,})/categories/:cid([0-9]{1,})', auth, removeCategory);
-
+router.get('/:id([0-9]{1,})/categories', getAllCategories);
+router.post('/:id([0-9]{1,})/categories/:cid([0-9]{1,})', auth, addCategory);
+router.del('/:id([0-9]{1,})/categories/:cid([0-9]{1,})', auth, removeCategory)
 // comments routes
-router.get('/issues/:id([0-9]{1,})/comments', getAllComments);
-router.post('/issues/:id([0-9]{1,})/comments', auth, bodyParser(), addCommentIds, validateComment, addComment);
+router.get('/:id([0-9]{1,})/comments', getAllComments);
+router.post('/:id([0-9]{1,})/comments', auth, bodyParser(), addCommentIds, validateComment, addComment);
 
 /**
  * Get all issues with pagination, ordering, and HATEOAS links.
  * 
  * @param {Object} ctx - Koa context object
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
 async function getAll(ctx) {
   try {
-    let {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
+    const {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
 
     // ensure params are integers
     limit = parseInt(limit);
@@ -105,7 +105,7 @@ async function getAll(ctx) {
  * Return the total number of likes for an issue post by its ID to the logged user.
  * 
  * @param {object} ctx 
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} JSON - Number of total likes
  */
@@ -130,7 +130,7 @@ async function likesCount(ctx) {
  * Register like to the current issue post by logged user.
  * 
  * @param {Object} ctx - Koa context object
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} JSON - Like status message
  */
@@ -156,7 +156,7 @@ async function likePost(ctx) {
  * Register dislike to the current issue post by logged user.
  * 
  * @param {Object} ctx - Koa context object
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} JSON - Dislike status message
  */
@@ -182,7 +182,7 @@ async function likePost(ctx) {
  * Get a Issue Post by its ID.
  * 
  * @param {Object} ctx - Koa context object
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} JSON - Issues post body with attributes
  */
@@ -208,7 +208,7 @@ async function getById(ctx) {
  * Create a new Issue Post.
  * 
  * @param {Object} ctx - Koa context object
- * @throws {Object} 400 - Not found
+ * @throws {Object} 400 - Bad Request
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} 201 - Success response
  */
@@ -238,7 +238,7 @@ async function createissue(ctx) {
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} 201 - Success response
  */
-async function updateissue(ctx) {
+async function updateIssue(ctx) {
   try {
     const id = ctx.params.id;
     let result = await issues.getById(id);  // check it exists
@@ -271,13 +271,49 @@ async function updateissue(ctx) {
 }
 
 /**
+ * Update an existing Issue Post's status by its ID.
+ * 
+ * @param {Object} ctx - Koa context object
+ * @throws {Object} 403 - Forbidden
+ * @throws {object} 404 - Not Found
+ * @throws {Object} 500 - Internal Server Error
+ * @returns {Object} 201 - Success response
+ */
+async function updateIssueStatus(ctx) {
+  try {
+    const id = ctx.params.id;
+    let result = await issues.getById(id);
+    if (result.length) {
+      let issue = result[0];
+      const permission = can.update(ctx.state.user, issue);
+      if (!permission.granted) {
+        ctx.status = 403;
+      } else {
+        result = await ctx.app.context.db.query('UPDATE issues SET status="Solved" WHERE ID=?', [id]);
+        if (result.affectedRows) {
+          ctx.status = 201;
+          ctx.body = {updated: true};
+        } 
+      }
+    } 
+    if (ctx.status !== 204 && ctx.status !== 403) {
+      ctx.status = 404;
+      ctx.body = { error: `Error: ${ctx.status} Issue not found.` };
+    }
+  } catch (error) {
+    ctx.status = 500;
+    ctx.body = { error: `Error: ${ctx.status} while trying to update the post status. Details: ${error.message}` };
+  }
+}
+
+/**
  * Delete a Issue Post by its ID.
  * 
  * @param {Object} ctx - Koa context object
  * @throws {Object} 403 - Forbidden
- * @throws {Object} 404 - Not found
+ * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} JSON - ID and boolean value
+ * @returns {number|boolean} JSON - ID and boolean value
  */
 async function deleteissue(ctx) {
   try {
@@ -306,7 +342,7 @@ async function deleteissue(ctx) {
  * @param {Object} ctx - Koa context object
  * @throws {Object} 404 - Not found
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} JSON - ID and views count number
+ * @returns {number|number} JSON - ID and views count number
  */
 async function getViewCount(ctx) {
   try {
@@ -356,7 +392,7 @@ async function addCategory(ctx) {
  * @param {Object} ctx - Koa context object
  * @throws {Object} 404 - Not found
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} JSON - Delete: boolean value
+ * @returns {string|boolean} JSON - Delete: boolean value
  */
 async function removeCategory(ctx) {
   try {
