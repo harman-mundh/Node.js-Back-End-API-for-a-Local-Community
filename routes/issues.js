@@ -25,9 +25,10 @@ const likes = require('../models/likes');
 const {validateIssue, validateComment} = require('../controllers/validationMiddleware'); 
 
 // URI endpoint to view the issues stored on db
-const Prefix = '/api/v1/issues'; 
-const router = Router({prefix: Prefix});
+const prefix_v1 = '/api/v1/issues'; 
+//const router = Router({prefix: Prefix});
 
+const commonIssueRoutes = function (router) {
 // issue routes
 router.get('/', getAll);
 router.post('/', auth, bodyParser(), validateIssue, createissue); // posting data
@@ -51,6 +52,9 @@ router.del('/:id([0-9]{1,})/categories/:cid([0-9]{1,})', auth, removeCategory)
 // comments routes
 router.get('/:id([0-9]{1,})/comments', getAllComments);
 router.post('/:id([0-9]{1,})/comments', auth, bodyParser(), addCommentIds, validateComment, addComment);
+
+return router;
+}
 
 /**
  * Get all issues with pagination, ordering, and HATEOAS links.
@@ -85,8 +89,8 @@ async function getAll(ctx) {
         // add links to the post summaries for HATEOAS compliance
         // clients can follow these to find related resources
         const links = {
-          likes: `${ctx.protocol}://${ctx.host}${Prefix}/${post.ID}/likes`,
-          self: `${ctx.protocol}://${ctx.host}${Prefix}/${post.ID}`
+          likes: `${ctx.protocol}://${ctx.host}${prefix_v1}/${post.ID}/likes`,
+          self: `${ctx.protocol}://${ctx.host}${prefix_v1}/${post.ID}`
         }
         return {ID, title, summary, imageURL, authorID, links};
       });
@@ -499,4 +503,4 @@ function addCommentIds(ctx, next) {
   return next();
 }
 
-module.exports = router;
+module.exports = commonIssueRoutes;

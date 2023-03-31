@@ -7,7 +7,7 @@
  */
 
 const db = require('../../helpers/database');
-import GmapsAPIke from '../../config';
+import GmapsAPIkey from '../../config';
 
 /**  ---------------------- FIX ------------------
  * Retrieves a user based on email pattern.
