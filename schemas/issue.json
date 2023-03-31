@@ -1,15 +1,18 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+
+      
       "issue": {
-        "id": "/issue",
+        "$id": "/issue",
         "title": "issue",
         "description": "An issue in the local community",
         "type": "object",
         "properties": {
           "title": {
             "description": "Main title of the issue",
-            "type": "string"
+            "type": "string",
+            "maxLength": 32
           },
           "allText": {
             "description": "Body text of the issue",
@@ -32,6 +35,10 @@
             "description": "User ID of the issue author",
             "type": "integer",
             "minimum": 0
+          },
+          "locationID": {
+            "description": "location ID of the coordinates",
+            "type": "integer"
           }
         },
         "required": ["title", "allText", "authorID"],

@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: Local Community Back End Demonstration API
-  description: A Local Community. Use the module worksheets to complete the code and API architecture!
+  description: A Local Community API, used to register user, create new issue, organise meetings and deliver announcements
   contact:
     name: Harman Singh
     email: singhh48@coventry.ac.uk
@@ -13,11 +13,26 @@ servers:
   - url: 'https://outsidefilter-epoxyderby-8080.codio-box.uk/api/v1'
     description: Development server
 tags:
+  - name: Speacial
+    description:
   - name: Users
     description: API endpoints for user management.
   - name: Issues
     description: Access and perform CRUD operations on issues entries.
+  - name: Comments
+    description:
+  - name: Categories
+    description:
+  - name: Uploads
+    description:
+  - name: Announcements
+    description:
+  - name: Meetings
+    description:
 paths:
+  /special:
+    summary:
+    description:
   /users:
     summary: Represents an individual user
     description: >
@@ -101,6 +116,83 @@ paths:
                 $ref: ./user.json#/definitions/userUpdated
         '404':
           description: Not found
+    delete:
+      tags:
+        - Users
+      description:
+        Delete user by id.
+      responses:
+        '200':
+          description: Confirmation of deletion.
+          content:
+            application/json:
+              schema:
+                $ref: ./user.json#/definitions/userDeleted
+        '401':
+          description: Only admin users can delete accounts
+        '404':
+          description: Not found
+  /issues:
+    summary:
+    description:
+  /comments:
+    summary:
+    description:
+  /categories:
+    summary:
+    description:
+  /uploads:
+    summary:
+    description:
+  /announcements:
+    summary:
+    description:
+  /meetings:
+    summary:
+    description:
+
+examples:
+    get:
+      tags:
+        - Users
+      description:
+        Get user by id.
+      responses:
+        '200':
+          description: View of user record
+          content:
+            application/json:
+              schema:
+                $ref: ./user.json#/definitions/userView
+        '401':
+          description: Non-admin users can only view their own record
+        '404':
+          description: Not found
+
+
+    put:
+      tags:
+        - Users
+      description:
+        Update user by id.
+      requestBody:
+        description: Update a visible property or the password.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./user.json#/definitions/userUpdate
+      responses:
+        '200':
+          description: Confirmation and link to record.
+          content:
+            application/json:
+              schema:
+                $ref: ./user.json#/definitions/userUpdated
+        '404':
+          description: Not found
+
+          
     delete:
       tags:
         - Users

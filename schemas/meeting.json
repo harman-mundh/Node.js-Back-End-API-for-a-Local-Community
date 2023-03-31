@@ -1,15 +1,18 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+
+      
       "meeting": {
-        "id": "/meeting",
+        "$id": "/meeting",
         "title": "meeting",
         "description": "An meeting in the local community",
         "type": "object",
         "properties": {
           "title": {
             "description": "Main title of the meeting",
-            "type": "string"
+            "type": "string",
+            "maxLength": 32
           },
           "allText": {
             "description": "Body text of the meeting",
@@ -33,7 +36,16 @@
             "description": "User ID of the meeting author",
             "type": "integer",
             "minimum": 0
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "locationID": {
+            "description": "location ID of the coordinates",
+            "type": "integer"
           }
+
         },
         "required": [
             "title",

@@ -1,11 +1,9 @@
 const Router = require('koa-router');
 const auth = require('../controllers/authMiddleware');
 
-const Prefix = '/api/v1'; 
-const router = Router({prefix: Prefix});
+const router = Router({prefix: '/api/v1'});
 
-const Prefix_v2 = '/api/v2'; 
-const router_v2 = Router({prefix: Prefix_v2});
+const router_v2 = Router({prefix: '/api/v2'});
 
 // router for v1
 router.get('/', publicAPI);

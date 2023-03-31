@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+
+      
+      "location": {
+        "$id": "/location",
+        "title": "location",
+        "description": "A location coordinates of the meeting in the local community",
+        "type": "object",
+        "properties": {
+            "ID": {
+                "description": "ID of the location coordinates",
+                "type": "integer"
+              },
+              "latitude": {
+                "description": "Latitude coordinates",
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitude": {
+                "description": "Longitude coordinates",
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "issueID": {
+                "description": "ID of the issues the locations are related to",
+                "type": "integer",
+                "minimum": 1
+              },
+              "meetingID": {
+                "description": "ID of the meeting the are related to",
+                "type": "integer",
+                "minimum": 1
+              }
+        },
+        "required": ["ID", "latitude", "longitude"],
+        "additionalProperties": false      
+      }
+    }
+  }

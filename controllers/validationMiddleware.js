@@ -12,6 +12,9 @@ const categorySchema = require('../schemas/category.json').definitions.category;
 const commentSchema = require('../schemas/comment.json').definitions.comment;
 const userSchema = require('../schemas/user.json').definitions.user;
 const userUpdateSchema = require('../schemas/user.json').definitions.userUpdate;
+const announcementSchema = require('../schemas/announcement.json').definitions.announcement;
+const meetingSchema = require('../schemas/meeting.json').definitions.meeting;
+const locationsSchema = require('../schemas/location.json').definitions.location;
 
 /**
  * Wrapper that returns a Koa middleware handler function that validates
@@ -57,7 +60,7 @@ const makeKoaValidator = (schema, resource) => {
 }
 
 /** Validate data against the issue schema. */
-exports.validateissue = makeKoaValidator(issueSchema, 'issue');
+exports.validateIssue = makeKoaValidator(issueSchema, 'issue');
 /** Validate data against the category schema. */
 exports.validateCategory = makeKoaValidator(categorySchema, 'category');
 /** Validate data against the comment schema. */
@@ -66,3 +69,9 @@ exports.validateComment = makeKoaValidator(commentSchema, 'comment');
 exports.validateUser = makeKoaValidator(userSchema, 'user');
 /** Validate data against the user schema for updating existing users. */
 exports.validateUserUpdate = makeKoaValidator(userUpdateSchema, 'userUpdate');
+/** Validate data against the announcement schema. */
+exports.validateAnnoucement = makeKoaValidator(announcementSchema, 'annoucement');
+/** Validate data against the meeting schema. */
+exports.validateMeeting = makeKoaValidator(meetingSchema, 'meeting');
+/** Validate data against the location schema related to the meeting. */
+exports.validateLocation = makeKoaValidator(locationsSchema, 'location');

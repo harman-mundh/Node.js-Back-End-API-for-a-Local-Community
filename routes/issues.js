@@ -12,21 +12,21 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 
 // resources related to creating and managing issues
-const router = require('./routes/special.js')
+
 const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/issues');
 const issues = require('../models/issues');
-const issueViews = require('../models/issueViews');
-const issueCategories = require('../models/issueCategories');
+const issueViews = require('../models/issuesViews');
+const issueCategories = require('../models/categories');
 const comments = require('../models/comments');
 const likes = require('../models/likes');
 
 // validation schema
-const {validateIssue, validateComment} = require('../controllers/validation'); 
+const {validateIssue, validateComment} = require('../controllers/validationMiddleware'); 
 
 // URI endpoint to view the issues stored on db
 const Prefix = '/api/v1/issues'; 
-// const router = Router({prefix: Prefix});
+const router = Router({prefix: Prefix});
 
 // issue routes
 router.get('/', getAll);

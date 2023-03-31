@@ -12,7 +12,7 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const model = require('../models/categories');
 const auth = require('../controllers/authMiddleware');
-const {validateCategory} = require('../controllers/validation');
+const {validateCategory} = require('../controllers/validationMiddleware'); 
 
 const Prefix = '/api/v1/categories'; 
 const router = Router({prefix: Prefix});

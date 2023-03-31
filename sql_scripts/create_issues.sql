@@ -9,6 +9,8 @@ CREATE TABLE issues (
       published BOOL NOT NULL DEFAULT 0,
       authorID INT NOT NULL,
       status ENUM('New', 'Work in progress', 'Solved') NOT NULL DEFAULT 'New',
+      locationID INT NOT NULL,
       PRIMARY KEY (ID),
-      FOREIGN KEY (authorID) REFERENCES users (ID) ON DELETE CASCADE
+      FOREIGN KEY (authorID) REFERENCES users (ID) ON DELETE CASCADE,
+      FOREIGN KEY (locationID) REFERENCES locations (ID) ON DELETE CASCADE
 );

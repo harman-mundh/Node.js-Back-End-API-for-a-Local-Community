@@ -5,7 +5,7 @@
  * @author Harman Singh
  * @requires koa,koa-bodyparser
  * @requires permissions/issues
- * @requires models/{issues, issuesViews, issueCatergories, commets, likes} 
+ * @requires models/{issues, issuesViews, issueCatergories, comments, likes} 
  */
 
 const Router = require('koa-router');
@@ -14,7 +14,7 @@ const etag = require('etag');
 const model = require('../models/users');
 const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/users');
-const {validateUser, validateUserUpdate} = require('../controllers/validation');
+const {validateUser, validateUserUpdate} = require('../controllers/validationMiddleware'); 
 
 const prefix = '/api/v1/users'
 const router = Router({prefix: prefix});
@@ -29,6 +29,7 @@ router.get('/search', auth, emailSearch);
 
 /**
  * Search for users by email address.
+ * 
  * @param {Object} ctx - Koa context object
  * @param {Function} next - Koa next middleware
  */
@@ -57,6 +58,7 @@ async function emailSearch(ctx, next) {
 
 /**
  * Authenticate user and return login information.
+ * 
  * @param {Object} ctx - Koa context object
  */
 async function login(ctx) {
@@ -70,6 +72,7 @@ async function login(ctx) {
 
 /**
  * Get all users with pagination and filtering by fields.
+ * 
  * @param {Object} ctx - Koa context object
  */
 async function getAll(ctx) {
@@ -115,6 +118,7 @@ async function getAll(ctx) {
 
 /**
  * Get a user by their ID.
+ * 
  * @param {Object} ctx - Koa context object
  * @param {Function} next - Koa next middleware
  */
@@ -156,6 +160,7 @@ async function getById(ctx, next) {
 
 /**
  * Create a new user.
+ * 
  * @param {Object} ctx - Koa context object
  */
 async function createUser(ctx) {
@@ -170,6 +175,7 @@ async function createUser(ctx) {
 
 /**
  * Update an existing user by their ID.
+ * 
  * @param {Object} ctx - Koa context object
  */
 async function updateUser(ctx) {
@@ -194,6 +200,7 @@ async function updateUser(ctx) {
 
 /**
  * Delete a user by their ID.
+ * 
  * @param {Object} ctx - Koa context object
  */
 async function deleteUser(ctx) {

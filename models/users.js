@@ -7,6 +7,7 @@
 
 const db = require('../helpers/database');
 const bcrypt = require('bcrypt');
+const { isStatusCode } = require('redoc');
 
 /**
  * Retrieves a user based on email pattern.
@@ -84,10 +85,12 @@ exports.add = async function add (user) {
  * Delete a user by specified ID.
  *
  * @param {number} id - The ID of the user to be deleted.
+ * @function {number} id - call function to perform soft delete.
  * @returns {Promise} - An array of objects representing the result of the query.
  * @throws {Error} - If the query fails for any reason.
  */
 exports.delById = async function delById (id) {
+  await updateAuthorID(id);
   const query = "DELETE FROM users WHERE ID = ?;";
   const values = [id];
   const data = await db.run_query(query, values);
@@ -112,3 +115,18 @@ exports.update = async function update (user) {
   const data = await db.run_query(query, values);
   return data;
 }
+
+/**
+ * Function used to preserve data on the API,
+ * before a user is delete all their post are 
+ * trasfered to placeholder user deletedUser (soft Delete the user)
+ * 
+ * @param {object} ID - user ID  
+ * @returns {Promise} - An array of objects representing the result of the query
+ */
+ exports.updateAuthorID = async function updateAuthorID(id) {
+  const query = "UPDATE issues SET authorID = 2 WHERE authorID = ?;";
+  const values = [id];
+  const data = await  db.run_query(query, values);
+  return data;
+ };

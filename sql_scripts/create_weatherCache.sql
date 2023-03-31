@@ -1,0 +1,7 @@
+CREATE TABLE weather_cache (
+    ID INT NOT NULL AUTO_INCREMENT,
+    location_key VARCHAR(32) NOT NULL,
+    data JSON NOT NULL,
+    last_updated  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID)
+);
