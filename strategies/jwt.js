@@ -11,9 +11,9 @@
  * @reference source: https://github.com/truthseekers/passport-jwt-tutorial/tree/master/server
  */
 
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import users from '../models/users';
-import { ExtractJwt } from 'passport-jwt';
+const JwtStrategy= require('passport-jwt').Strategy;
+const users = require('../models/users');
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 const secretKey = process.env.SECRET_KEY;
 
 // configure the jwt strategy options
@@ -31,7 +31,7 @@ const jwtOptions = {
  * @returns {Promise} JSON - object with the role of the user
  * @throws {Error} - If user cannot be found in the database
  */
-exports.verifyToken = async function (jwt_payload, done) {
+const verifyToken = async function (jwt_payload, done) {
   try{
     // function to find the user in the database given the ctx from paylod
     const result = await users.findById(jwt_payload.id);
