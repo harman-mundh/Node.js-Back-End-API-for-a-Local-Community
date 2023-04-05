@@ -9,6 +9,8 @@
  * @reference source: http://www.passportjs.org/packages/passport-jwt/ 
  * @reference source: https://medium.com/@rob.s.ellis/koa-api-secured-with-passport-jwt-2fd2d32771bd
  * @reference source: https://github.com/truthseekers/passport-jwt-tutorial/tree/master/server
+ * @reference source: https://www.youtube.com/watch?v=Tau0ZMJ4aR0&ab_channel=TruthSeekers
+ * @reference source: https://github.com/truthseekers/passport-jwt-tutorial/blob/master/server/app.js
  */
 
 const JwtStrategy= require('passport-jwt').Strategy;

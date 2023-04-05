@@ -1,30 +1,32 @@
 /**
- * A module for performing CRUD methods on locations table in a MySQL database.
+ * A module for performing CRUD methods on weather cache table in a MySQL database.
  * 
- * @module models/issues
+ * @module accuWeather-model
  * @author Harman Singh
  * @requires ../helpers/database
  */
 
  const db = require('../../helpers/database');
 
- /**  ---------------------- FIX ------------------
- * Retrieves a user based on email pattern.
+ /** 
+ * Retrieves a Accu weather data from cache table.
  *
- * @param {object} email - The email of the user to search  for.
- * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
+ * @returns {JSON||NULL} - function returns the data saved within the last 24 hours or null if not available.
  */
-
-exports.getCachedAccuData = async function getCachedAccuData(locationID) {
+exports.getCachedAccuData = async function getCachedAccuData() {
     const query = `SELECT data FROM weather_cache
-                    WHERE last_updated >= (NOW() - INTERVAL 24 HOUR)
                     ORDER BY last_updated DESC LIMIT 1;
                     `;
-    const data = await db.run_query(query, locationID);
-    return data;
+    const result = await db.run_query(query);
+    return result.length ? result[0].data : null;
 }
 
+ /** 
+ * Use API get response to save weather data into table weather cache.
+ *
+ * @param {Object} data - Weather API 5 days resonse data in json form to be stored.
+ * @return {Promise} data - Console log data saved in table or throws error.
+ */
 exports.putResponseAccuData = async function putResponseAccuData(response) {
     const query = "INSERT INTO weather_cache (data) VALUES ?;";
     await db.run_query(query, [JSON.stringify(response)]);

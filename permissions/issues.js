@@ -1,8 +1,8 @@
 const AccessControl = require('role-acl');
 const ac = new AccessControl();
 
-// controls for specific CRUD operations on article records
-// don't let users update an article ID or the authorID
+// controls for specific CRUD operations on issues records
+// don't let users update an issues ID or the authorID
 ac
   .grant('user')
   .condition({Fn:'EQUALS', args: {'requester':'$.owner'}})

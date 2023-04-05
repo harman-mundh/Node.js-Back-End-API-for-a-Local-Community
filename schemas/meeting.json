@@ -18,10 +18,6 @@
             "description": "Body text of the meeting",
             "type": "string"
           },
-          "location": {
-            "description": "location of the meeting",
-            "type": "string"
-          },
           "start_time": {
             "description": "start date and time of scheduled meeting",
             "type": "string",
@@ -50,7 +46,6 @@
         "required": [
             "title",
             "allText",
-            "location",
             "start_time",
             "end_time",
             "authorID"],
