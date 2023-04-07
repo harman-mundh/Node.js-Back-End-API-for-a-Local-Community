@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/categories.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/categories.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * KOA router module for managing resources related to issues resources with HTTP methods.
+ * 
+ * @module issueRoutes
+ * @author Harman Singh
+ * @requires koa,koa-bodyparser
+ * @requires permissions/issues
+ * @requires models/{issues, issuesViews, issueCatergories, commets, likes} 
+ */
+
+const Router = require('koa-router');
+const bodyParser = require('koa-bodyparser');
+const model = require('../models/categories');
+const auth = require('../controllers/authMiddleware');
+const {validateCategory, validateCategoryUpdate} = require('../controllers/validationMiddleware'); 
+
+const prefix_v1 = '/api/v1/categories'; 
+const router = Router({prefix: prefix_v1});
+
+router.get('/', getAll);
+router.post('/', auth, bodyParser(), validateCategory, createCategory);
+router.get('/:id([0-9]{1,})', getById);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), validateCategoryUpdate, updateCategory);
+router.del('/:id([0-9]{1,})', auth, deleteCategory);
+
+// TODO: validation
+// TODO: error handling
+
+/**
+ * Get all categories.
+ * @param {Object} ctx - Koa context object
+ */
+async function getAll(ctx) {
+  const result = await model.getAll();
+  ctx.body = result;
+}
+
+/**
+ * Get a category by its ID.
+ * @param {Object} ctx - Koa context object
+ */
+async function getById(ctx) {
+  const id = ctx.params.id;
+  const result = await model.getById(id);
+  const category = result[0];
+  ctx.body = category;
+}
+
+/**
+ * Create a new category.
+ * @param {Object} ctx - Koa context object
+ */
+async function createCategory(ctx) {
+  const body = ctx.request.body;
+  const result = await model.add(body);
+  const id = result.insertId;
+  ctx.status = 201;
+  ctx.body = {ID: id, created: true, link: `${ctx.request.path}/${id}`};
+}
+
+/**
+ * Update an existing category by its ID.
+ * @param {Object} ctx - Koa context object
+ */
+async function updateCategory(ctx) {
+  const id = ctx.params.id;
+  let result = await model.getById(id);  // get existing record
+  let category = result[0];
+  // exclude id field that should not be updated
+  const {ID, ...body} = ctx.request.body;
+  // overwrite other fields with remaining body data
+  Object.assign(category, body);
+  await model.update(category);
+  ctx.body = {ID: id, updated: true, link: ctx.request.path};
+}
+
+/**
+ * Delete a category by its ID.
+ * @param {Object} ctx - Koa context object
+ */
+async function deleteCategory(ctx) {
+  const id = ctx.params.id;
+  await model.delById(id);
+  ctx.body = {ID: id, deleted: true}
+}
+
+module.exports = router;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-accuWeather.html">accuWeather</a></li><li><a href="module-accuWeather-model.html">accuWeather-model</a></li><li><a href="module-announcements.html">announcements</a></li><li><a href="module-authMiddleware.html">authMiddleware</a></li><li><a href="module-basic.html">basic</a></li><li><a href="module-checkRoleMiddleware.html">checkRoleMiddleware</a></li><li><a href="module-controllers_comments.html">controllers/comments</a></li><li><a href="module-controllers_validationMiddleware.html">controllers/validationMiddleware</a></li><li><a href="module-geocodingGMaps.html">geocodingGMaps</a></li><li><a href="module-helpers_database.html">helpers/database</a></li><li><a href="module-issueRoutes.html">issueRoutes</a></li><li><a href="module-issues.html">issues</a></li><li><a href="module-jwt.html">jwt</a></li><li><a href="module-loggerMiddleware.html">loggerMiddleware</a></li><li><a href="module-meetings.html">meetings</a></li><li><a href="module-models_announcements.html">models/announcements</a></li><li><a href="module-models_announcementsViews.html">models/announcementsViews</a></li><li><a href="module-models_categories.html">models/categories</a></li><li><a href="module-models_issueLikes.html">models/issueLikes</a></li><li><a href="module-models_issuecategories.html">models/issuecategories</a></li><li><a href="module-models_issues.html">models/issues</a></li><li><a href="module-models_meetings.html">models/meetings</a></li><li><a href="module-models_meetingsViews.html">models/meetingsViews</a></li><li><a href="module-models_users.html">models/users</a></li><li><a href="module-routes_comments.html">routes/comments</a></li></ul><h3>Classes</h3><ul><li><a href="module-helpers_database-DatabaseException.html">DatabaseException</a></li></ul><h3>Global</h3><ul><li><a href="global.html#privateAPI">privateAPI</a></li><li><a href="global.html#publicAPI">publicAPI</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 07 2023 15:50:50 GMT+0000 (GMT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

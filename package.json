@@ -7,9 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "devStart": "nodemon index.js"
+    "test": "cross-env DB_DATABASE=test_db jest --testTimeout=10000",
+    "test:watch": "cross-env DB_DATABASE=test_db jest --watch",
+    "testDB:drop": "mysql --user=root --password=codio -e 'DROP DATABASE test_db;'",
+    "testDB:create": "mysql --user=root --password=codio -e 'CREATE DATABASE test_db;'",
+    "testDB:migrate": "mysqldump --user=root --password=codio local_community | mysql --user=root --password=codio test_db",
+    "pretest": "npm run testDB:drop && npm run testDB:create &&  npm run testDB:migrate"
   },
   "jest": {
     "testEnvironment": "node",
@@ -38,6 +41,7 @@
     "koa-bodyparser": "^4.3.0",
     "koa-conditional-get": "^3.0.0",
     "koa-etag": "^4.0.0",
+    "koa-logger": "^3.2.1",
     "koa-mount": "^4.0.0",
     "koa-passport": "^6.0.0",
     "koa-router": "^9.4.0",
@@ -50,10 +54,11 @@
     "promise-mysql": "^4.1.3",
     "redoc": "^2.0.0",
     "role-acl": "^4.5.4",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
+    "cross-env": "^7.0.3",
     "eslint": "^7.14.0",
     "jest": "^26.6.3",
     "supertest": "^6.3.3"

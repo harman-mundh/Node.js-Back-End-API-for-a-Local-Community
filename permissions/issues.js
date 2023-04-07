@@ -24,7 +24,7 @@ exports.update = (requester, data) => {
     .execute('update')
     .sync()
     .on('article');
-}
+  }
 
 exports.delete = (requester) => {
   return ac
@@ -32,4 +32,4 @@ exports.delete = (requester) => {
     .execute('delete')
     .sync()
     .on('article');
-}
+  }

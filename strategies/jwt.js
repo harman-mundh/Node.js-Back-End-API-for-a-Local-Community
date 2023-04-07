@@ -1,11 +1,11 @@
 /**
- * KOA router module for managing resources related to issues resources with HTTP methods.
+ * KOA jwt authorization strategy to for the user and admin role .
  * 
- * @module issueRoutes
+ * @module jwt
  * @author Harman Singh
- * @requires koa,koa-bodyparser
- * @requires permissions/issues
- * @requires models/{issues, issuesViews, issueCatergories, commets, likes}
+ * @requires passport-jwt
+ * @requires secretKey - env saved locally not tracked
+ * @requires models/{users}
  * @reference source: http://www.passportjs.org/packages/passport-jwt/ 
  * @reference source: https://medium.com/@rob.s.ellis/koa-api-secured-with-passport-jwt-2fd2d32771bd
  * @reference source: https://github.com/truthseekers/passport-jwt-tutorial/tree/master/server
@@ -13,14 +13,14 @@
  * @reference source: https://github.com/truthseekers/passport-jwt-tutorial/blob/master/server/app.js
  */
 
-const JwtStrategy= require('passport-jwt').Strategy;
 const users = require('../models/users');
+const JwtStrategy= require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const secretKey = process.env.SECRET_KEY;
 
 // configure the jwt strategy options
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromUrlQueryParameter("jwt"),
   secretOrKey: secretKey,
   algorithms: ['HS256'],
 }

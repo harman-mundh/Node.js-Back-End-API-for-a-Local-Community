@@ -8,13 +8,11 @@
  */
 
 const passport = require('koa-passport');
+const basicAuth = require('../strategies/basic');
 const jwtStrategy = require('../strategies/jwt');
 
- /**
-  * Sets up the basic authentication strategy for passport to use.
-  */
+passport.use(basicAuth);
 passport.use(jwtStrategy);
- 
-module.exports = passport.authenticate(['jwt'], {session:false});
 
-//app.use(passport.initiliaze())
+module.exports = passport.authenticate(['basic'], {session:false});
+//module.exports = passport.authenticate(['basic', 'jwt'], {session:false});

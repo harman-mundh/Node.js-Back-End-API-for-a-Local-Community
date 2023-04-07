@@ -17,16 +17,16 @@ const announcements = require('../models/announcements');
 const announcementsViews = require('../models/announcementsViews');
 
 // validation schema
-const {validateAnnoucement} = require('../controllers/validationMiddleware');
+const {validateAnnoucement, validateAnnoucementUpdate} = require('../controllers/validationMiddleware');
 
 const prefix_v2 = '/api/v2/announcements';
-const router = Router({prefix: Prefix});
+const router = Router({prefix: prefix_v2});
 
 // announcements routes
 router.get('/', getAll);
 router.get('/:id([0-9]{1,})', getById);
 router.post('/', auth, bodyParser(), validateAnnoucement, createAnnouncement);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), validateAnnoucement, updateAnnouncement);
+router.put('/:id([0-9]{1,})', auth, bodyParser(), validateAnnoucementUpdate, updateAnnouncement);
 router.del('/:id([0-9]{1,})', auth, deleteAnnouncement);
 
 // views counts
@@ -43,42 +43,19 @@ router.get('/announcements/:id([0-9]{1,})/views', getViewCount);
  */
 async function getAll(ctx) {
   try {
-    const {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
+    const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
 
-    // ensure params are integers
-    limit = parseInt(limit);
-    page = parseInt(page);
-    
-    // validate pagination values to ensure they are sensible
-    limit = limit > 100 ? 100 : limit;
-    limit = limit < 1 ? 10 : limit;
-    page = page < 1 ? 1 : page;
-
-    // ensure order and direction make sense
-    order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
-    direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
-
-    const result = await announcements.getAll(page, limit, order, direction);
-    if (result.length) {
-      const body = result.map(post => {
-        // extract the post fields we want to send back (summary details)
-        const {ID, title, allText, authorID} = post;
-        // add links to the post summaries for HATEOAS compliance
-        // clients can follow these to find related resources
-        const links = {
-          goBack: `${ctx.protocol}://${ctx.host}${prefix_v2}/`,
-          self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}`
-        }
-        return {ID, title, allText, authorID, links};
-      });
-      ctx.body = body;
+    const issuesData = await announcements.getAll(page, limit, order, direction);
+    ctx.body = issuesData;
+    if (issuesData.length) {
+      ctx.body = issuesData;
     } else {
       ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} No Announcements posts were found.` };
+      ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to retrive all Announcements posts from DB. Details: ${error.message}`};
+    ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all announcements posts from DB. Details: ${error.message}`};
   }
 }
 
@@ -228,4 +205,4 @@ async function getViewCount(ctx) {
   }
 }
 
-module.exports = announcementRoutes;
+module.exports = router;

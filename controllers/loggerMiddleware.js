@@ -1,19 +1,15 @@
 /**
- * KOA router module for managing resources related to issues resources with HTTP methods.
+ * KOA middleware for logging security events on the application when HTTP methods are called.
  * 
- * @module issueRoutes
+ * @module loggerMiddleware
  * @author Harman Singh
- * @requires koa,koa-bodyparser
- * @requires permissions/issues
- * @requires models/{issues, issuesViews, issueCatergories, commets, likes} 
+ * @requires {fs, path}
  * @source https://github.com/gitdagray/mern_stack_course/blob/main/lesson_13-backend/middleware/logger.js
+ * @source https://www.npmjs.com/package/winston
+ * @source https://www.npmjs.com/package/koa-logger
  */
 
-const { format } = require('date-fns');
-const { v4: uuid } = require('uuid');
-const fs = require('fs');
-const fsPromises = require('fs').promises;
-const path = require('path');
+const winston = require('winston');
 
 /**
  * Log events to a specified log file.
@@ -21,30 +17,7 @@ const path = require('path');
  * @param {string} message - The message to be logged.
  * @param {string} logFileName - The name of the log file.
  */
-const logEvents = async (message, logFileName) => {
-  const dateTime = format(new Date(), 'yyyyMMdd\tHH:mm:ss');
-  const logItem = `${dateTime}\t${uuid()}\t${message}\n`;
-
-  try {
-    if (!fs.existsSync(path.join(__dirname, '..', 'logs'))) {
-      await fsPromises.mkdir(path.join(__dirname, '..', 'logs'));
-    }
-    await fsPromises.appendFile(path.join(__dirname, '..', 'logs', logFileName), logItem);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-/**
- * Koa middleware to log request events.
- * @async
- * @param {Object} ctx - Koa context object.
- * @param {Function} next - Koa next function.
- */
-const logger = async (ctx, next) => {
-  logEvents(`${ctx.method}\t${ctx.url}\t${ctx.headers.origin}`, 'reqLog.log');
-  console.log(`${ctx.method} ${ctx.path}`);
+exports.logger = async function logger(ctx, next) {
   await next();
-};
+}
 
-module.exports = { logEvents, logger };

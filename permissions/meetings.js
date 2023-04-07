@@ -49,20 +49,20 @@ ac
   .on('meetings');
 
 exports.create = (requester) => {
-return ac
+  return ac
     .can(requester.role)
     .execute('create')
     .sync()
     .on('meetings');
-}
+  }
 
 exports.read = (requester) => {
-    return ac
-        .can(requester.role)
-        .execute('read')
-        .sync()
-        .on('meetings');
-    }
+  return ac
+    .can(requester.role)
+    .execute('read')
+    .sync()
+    .on('meetings');
+  }
 
 exports.update = (requester, data) => {
     console.log(requester)
@@ -73,7 +73,7 @@ exports.update = (requester, data) => {
     .execute('update')
     .sync()
     .on('meetings');
-}
+  }
 
 exports.delete = (requester, data) => {
     console.log(requester)
@@ -84,4 +84,4 @@ exports.delete = (requester, data) => {
     .execute('delete')
     .sync()
     .on('meetings');
-}
+  }

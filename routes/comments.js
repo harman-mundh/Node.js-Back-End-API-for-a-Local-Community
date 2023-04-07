@@ -12,8 +12,8 @@ const auth = require('../controllers/authMiddleware');
 const comments = require('../models/comments');
 
 // Endpoint prefix
-const Prefix = '/api/v1/comments'; 
-const router = Router({Prefix: '/api/v1/comments'});
+const prefix_v1 = '/api/v1/comments'; 
+const router = Router({Prefix: prefix_v1});
 
 /**
  * Delete a comment by ID.

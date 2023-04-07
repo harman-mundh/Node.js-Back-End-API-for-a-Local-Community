@@ -7,14 +7,13 @@
 
 const db = require('../helpers/database');
 const bcrypt = require('bcrypt');
-const { isStatusCode } = require('redoc');
+//const { isStatusCode } = require('redoc');
 
 /**
  * Retrieves a user based on email pattern.
  *
  * @param {object} email - The email of the user to search  for.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.emailSearch = async function emailSearch (email) {
   const query = "SELECT * FROM users WHERE email LIKE ?;";
@@ -27,7 +26,6 @@ exports.emailSearch = async function emailSearch (email) {
  *
  * @param {number} id - The ID of the user to retrieved.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getById = async function getById (id) {
   const query = "SELECT * FROM users WHERE ID = ?;";
@@ -41,7 +39,6 @@ exports.getById = async function getById (id) {
  *
  * @param {string} username - The username of the user to be retrieved.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.findByUsername = async function getByUsername(username) {
   const query = "SELECT * FROM users WHERE username = ?;";
@@ -55,7 +52,6 @@ exports.findByUsername = async function getByUsername(username) {
  * @param {number} limit - The maximum number of results to return DEFAULT=10.
  * @param {number} page - The page number to retrieve DEFAULT=1.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getAll = async function getAll (limit=10, page=1) {
   const offset = (page - 1) * limit;
@@ -70,7 +66,6 @@ exports.getAll = async function getAll (limit=10, page=1) {
  * @param {object} user - The user object to be added in the database.
  * @param {string} user.password - The unencrypted (STRING) password of the new user.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.add = async function add (user) {
   const query = "INSERT INTO users SET ?";
@@ -87,7 +82,6 @@ exports.add = async function add (user) {
  * @param {number} id - The ID of the user to be deleted.
  * @function {number} id - call function to perform soft delete.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.delById = async function delById (id) {
   await updateAuthorID(id);
@@ -102,7 +96,6 @@ exports.delById = async function delById (id) {
  * 
  * @param {object} user - User object to be updated
  * @return {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.update = async function update (user) {
   const query = "UPDATE users SET ? WHERE ID = ?;";
@@ -124,7 +117,7 @@ exports.update = async function update (user) {
  * @param {object} ID - user ID  
  * @returns {Promise} - An array of objects representing the result of the query
  */
- exports.updateAuthorID = async function updateAuthorID(id) {
+ updateAuthorID = async function updateAuthorID(id) {
   const query = "UPDATE issues SET authorID = 2 WHERE authorID = ?;";
   const values = [id];
   const data = await  db.run_query(query, values);

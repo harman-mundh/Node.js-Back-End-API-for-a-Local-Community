@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/categories.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/categories.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * A module for performing CRUD methods on likes for managing status
+ * record of the issue in a MySQL database.
+ * @module models/categories
+ * @author Harman Singh
+ */
+
+const db = require('../helpers/database');
+
+/**
+ * Lists all status records in the database.
+ *
+ * @returns {Promise} - An array of objects representing the status records.
+ */
+exports.getAll = async function getAll () {
+  const query = "SELECT * FROM categories;";
+  const data = await db.run_query(query);
+  return data;
+}
+
+/**
+ * Retrieves a single status record from the database by its ID.
+ *
+ * @param {number} id - The ID of the status record to retrieve.
+ * @returns {Promise} - An array of objects representing the retrieved status record.
+ */
+exports.getById = async function getById (id) {
+  const query = "SELECT * FROM categories WHERE ID = ?;";
+  const data = await db.run_query(query, [id]);
+  return data;
+}
+
+/**
+ * Create a new status record in the database.
+ *
+ * @param {object} status - An object representing the status record to add.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
+exports.add = async function add (status) {
+  const query = "INSERT INTO categories SET ?;";
+  const data = await db.run_query(query, status);
+  return data;
+}
+
+/**
+ * Updates an existing status record in the database.
+ *
+ * @param {object} status - An object representing the status record to update.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
+exports.update = async function add (status) {
+  const query = "UPDATE categories SET ? WHERE ID=?;";
+  const data = await db.run_query(query, [status, status.ID]);
+  return data;
+}
+
+/**
+ * Deletes a status record from the database by its ID.
+ *
+ * @param {number} id - The ID of the status record to delete.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
+exports.delById = async function delById (id) {
+  const query = "DELETE FROM categories WHERE ID = ?;";
+  const data = await db.run_query(query, [id]);
+  return data;
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-accuWeather.html">accuWeather</a></li><li><a href="module-accuWeather-model.html">accuWeather-model</a></li><li><a href="module-announcements.html">announcements</a></li><li><a href="module-authMiddleware.html">authMiddleware</a></li><li><a href="module-basic.html">basic</a></li><li><a href="module-checkRoleMiddleware.html">checkRoleMiddleware</a></li><li><a href="module-controllers_comments.html">controllers/comments</a></li><li><a href="module-controllers_validationMiddleware.html">controllers/validationMiddleware</a></li><li><a href="module-geocodingGMaps.html">geocodingGMaps</a></li><li><a href="module-helpers_database.html">helpers/database</a></li><li><a href="module-issueRoutes.html">issueRoutes</a></li><li><a href="module-issues.html">issues</a></li><li><a href="module-jwt.html">jwt</a></li><li><a href="module-loggerMiddleware.html">loggerMiddleware</a></li><li><a href="module-meetings.html">meetings</a></li><li><a href="module-models_announcements.html">models/announcements</a></li><li><a href="module-models_announcementsViews.html">models/announcementsViews</a></li><li><a href="module-models_categories.html">models/categories</a></li><li><a href="module-models_issueLikes.html">models/issueLikes</a></li><li><a href="module-models_issuecategories.html">models/issuecategories</a></li><li><a href="module-models_issues.html">models/issues</a></li><li><a href="module-models_meetings.html">models/meetings</a></li><li><a href="module-models_meetingsViews.html">models/meetingsViews</a></li><li><a href="module-models_users.html">models/users</a></li><li><a href="module-routes_comments.html">routes/comments</a></li></ul><h3>Classes</h3><ul><li><a href="module-helpers_database-DatabaseException.html">DatabaseException</a></li></ul><h3>Global</h3><ul><li><a href="global.html#privateAPI">privateAPI</a></li><li><a href="global.html#publicAPI">publicAPI</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 07 2023 15:50:50 GMT+0000 (GMT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -8,25 +8,23 @@
 const db = require('../helpers/database');
 
 /**
- * Get all comments on a given article
+ * Get all comments on a given Issue
  *
- * @param {number} articleID - The ID of the article to retrieve comments for.
+ * @param {number} issueID - The ID of the Issue to retrieve comments for.
  * @returns {Promise} - An array of comment objects.
- * @throws {Error} - If the query fails for any reason.
  */
-exports.getAll = async function getAll (articleID) {
-  const query = "SELECT * FROM comments WHERE articleID = ?;";
-  const data = await db.run_query(query, [articleID]);
+exports.getAll = async function getAll (issuesID) {
+  const query = "SELECT * FROM comments WHERE issuesID = ?;";
+  const data = await db.run_query(query, [issuesID]);
   return data;
 }
 
 /**
- * Create a new comment (must contain articleID in comment)
+ * Create a new comment (must contain issueID in comment)
  *
  * @param {object} comment - The comment object to add to the database.
- * @param {number} comment.articleID - The ID of the article the comment belongs to.
+ * @param {number} comment.issuesID - The ID of the issues the comment belongs to.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.add = async function add (comment) {
   const query = "INSERT INTO comments SET ?";
@@ -39,7 +37,6 @@ exports.add = async function add (comment) {
  *
  * @param {number} id - The ID of the comment to be delete.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.deleteById = async function deleteById (id) {
   const query = "DELETE FROM comments WHERE ID = ?;";
@@ -52,7 +49,6 @@ exports.deleteById = async function deleteById (id) {
  *
  * @param {number} id - The ID of the comment to retrieve.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getById = async function getById (id) {
   const query = "SELECT * FROM comments WHERE ID = ?;";

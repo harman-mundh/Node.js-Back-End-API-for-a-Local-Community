@@ -11,7 +11,6 @@ const db = require('../helpers/database');
  * Lists all status records in the database.
  *
  * @returns {Promise} - An array of objects representing the status records.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getAll = async function getAll () {
   const query = "SELECT * FROM categories;";
@@ -24,7 +23,6 @@ exports.getAll = async function getAll () {
  *
  * @param {number} id - The ID of the status record to retrieve.
  * @returns {Promise} - An array of objects representing the retrieved status record.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getById = async function getById (id) {
   const query = "SELECT * FROM categories WHERE ID = ?;";
@@ -37,7 +35,6 @@ exports.getById = async function getById (id) {
  *
  * @param {object} status - An object representing the status record to add.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.add = async function add (status) {
   const query = "INSERT INTO categories SET ?;";
@@ -50,7 +47,6 @@ exports.add = async function add (status) {
  *
  * @param {object} status - An object representing the status record to update.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.update = async function add (status) {
   const query = "UPDATE categories SET ? WHERE ID=?;";
@@ -63,7 +59,6 @@ exports.update = async function add (status) {
  *
  * @param {number} id - The ID of the status record to delete.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.delById = async function delById (id) {
   const query = "DELETE FROM categories WHERE ID = ?;";

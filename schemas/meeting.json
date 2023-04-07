@@ -4,7 +4,7 @@
 
       
       "meeting": {
-        "$id": "/meeting",
+        "$id": "#meeting",
         "title": "meeting",
         "description": "An meeting in the local community",
         "type": "object",
@@ -35,7 +35,13 @@
           },
           "dateCreated": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "The timestamo whe the meeting was created"
+          },
+          "dateModified":{
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamo whe the meeting was last modified"
           },
           "locationID": {
             "description": "location ID of the coordinates",
@@ -50,6 +56,40 @@
             "end_time",
             "authorID"],
         "additionalProperties": false      
+      },
+
+
+      "meetingUpdate": {
+        "$id": "#meetingUpdate",
+        "title": "meeting post Updated",
+        "description": "a updated meeting in the local community",
+        "type": "object",
+        "properties": {
+          "title": {
+            "description": "Main title of the meeting",
+            "type": "string",
+            "maxLength": 32
+          },
+          "allText": {
+            "description": "Body text of the meeting",
+            "type": "string"
+          },
+          "start_time": {
+            "description": "start date and time of scheduled meeting",
+            "type": "string",
+            "format": "date-time"
+          },
+          "end_time": {
+            "description": "end date and time of scheduled meeting",
+            "type": "string",
+            "format": "date-time"
+          },
+          "locationID": {
+            "description": "location ID of the coordinates",
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false     
       }
     }
   }

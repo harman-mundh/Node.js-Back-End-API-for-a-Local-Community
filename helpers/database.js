@@ -2,7 +2,7 @@
  * A module to run SQL queries on MySQL on behalf of the API models.
  * 
  * @module helpers/database
- * @author Harman Singh
+ * @author Colin Stephen
  * @see models/* for the models that require this module
  */
 

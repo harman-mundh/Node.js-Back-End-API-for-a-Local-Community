@@ -11,63 +11,21 @@
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const etag = require('etag');
-const model = require('../models/users');
+const users = require('../models/users');
 const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/users');
 const {validateUser, validateUserUpdate} = require('../controllers/validationMiddleware'); 
 
-const prefix = '/api/v1/users'
-const router = Router({prefix: prefix});
+const commonUserRoutes = function commonUserRoutes (prefix) {
+  const router = Router({prefix: prefix});
 
-router.get('/', auth, getAll); // check permissions and require authentication 
-router.post('/', bodyParser(), validateUser, createUser);
-router.post('/login', auth, login);
-router.get('/:id([0-9]{1,})', auth, getById);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), validateUserUpdate, updateUser);
-router.del('/:id([0-9]{1,})', auth, deleteUser);
-router.get('/search', auth, emailSearch);
+  router.get('/', auth, getAll); // check permissions and require authentication 
+  router.post('/', bodyParser(), validateUser, createUser);
+  router.get('/:id', auth, getById); //([0-9]{1,})
+  router.put('/:id([0-9]{1,})', auth, bodyParser(), validateUserUpdate, updateUser);
+  router.del('/:id([0-9]{1,})', auth, deleteUser);
 
-/**
- * Search for users by email address.
- * 
- * @param {Object} ctx - Koa context object
- * @param {Function} next - Koa next middleware
- */
-async function emailSearch(ctx, next) {
-  // TODO: this implementation is basic
-  // you could add pagination, partial response, etc.
-
-  const permission = can.readAll(ctx.state.user);
-  if (!permission.granted) {
-    ctx.status = 403;
-  } else {
-    let {q} = ctx.request.query;
-    
-    if (q && q.length < 3) {
-      ctx.status = 400;
-      ctx.body = {message: "Search string length must be 3 or more."}
-      return next();
-    }
-
-    let result = await model.emailSearch(q);
-    if (result.length) {
-      ctx.body = result;
-    }    
-  }
-}
-
-/**
- * Authenticate user and return login information.
- * 
- * @param {Object} ctx - Koa context object
- */
-async function login(ctx) {
-  // return any details needed by the client
-  const {ID, username, email, avatarURL} = ctx.state.user
-  const links = {
-    self: `${ctx.protocol}://${ctx.host}${prefix}/${ID}`
-  }
-  ctx.body = {ID, username, email, avatarURL, links};
+  return router;
 }
 
 /**
@@ -93,7 +51,7 @@ async function getAll(ctx) {
     limit = limit < 1 ? 10 : limit;
     page = page < 1 ? 1 : page;    
 
-    let result = await model.getAll(limit, page);
+    let result = await users.getAll(limit, page);
     if (result.length) {
       if (fields !== null) {
         // first ensure the fields are contained in an array
@@ -124,7 +82,7 @@ async function getAll(ctx) {
  */
 async function getById(ctx, next) {
   const id = ctx.params.id;
-  const result = await model.getById(id);
+  const result = await users.getByUsername(id);
   if (result.length) {
     const data = result[0]
     const permission = can.read(ctx.state.user, data);
@@ -157,7 +115,6 @@ async function getById(ctx, next) {
   }
 }
 
-
 /**
  * Create a new user.
  * 
@@ -165,7 +122,7 @@ async function getById(ctx, next) {
  */
 async function createUser(ctx) {
   const body = ctx.request.body;
-  const result = await model.add(body);
+  const result = await users.add(body);
   if (result.affectedRows) {
     const id = result.insertId;
     ctx.status = 201;
@@ -180,7 +137,7 @@ async function createUser(ctx) {
  */
 async function updateUser(ctx) {
   const id = ctx.params.id;
-  let result = await model.getById(id);  // check it exists
+  let result = await users.getById(id);  // check it exists
   if (result.length) {
     let data = result[0];
     const permission = can.update(ctx.state.user, data);
@@ -190,7 +147,7 @@ async function updateUser(ctx) {
       // exclude fields that should not be updated
       const newData = permission.filter(ctx.request.body);
       Object.assign(newData, {ID: id}); // overwrite updatable fields with body data
-      result = await model.update(newData);
+      result = await users.update(newData);
       if (result.affectedRows) {
         ctx.body = {ID: id, updated: true, link: ctx.request.path};
       }
@@ -205,7 +162,7 @@ async function updateUser(ctx) {
  */
 async function deleteUser(ctx) {
   const id = ctx.params.id;
-  let result = await model.getById(id);
+  let result = await users.getById(id);
   if (result.length) {
     const data = result[0];
     console.log("trying to delete", data);
@@ -213,7 +170,7 @@ async function deleteUser(ctx) {
     if (!permission.granted) {
       ctx.status = 403;
     } else {
-      result = await model.delById(id);
+      result = await users.delById(id);
       if (result.affectedRows) {
         ctx.body = {ID: id, deleted: true}
       }      
@@ -221,4 +178,4 @@ async function deleteUser(ctx) {
   }
 }
 
-module.exports = router;
+module.exports = commonUserRoutes;

@@ -3,7 +3,7 @@
     "definitions": {
 
       "announcement": {
-        "$id": "/announcement",
+        "$id": "#announcement",
         "title": "announcement",
         "description": "An announcement in the local community",
         "type": "object",
@@ -21,10 +21,40 @@
             "description": "User ID of the announcement author",
             "type": "integer",
             "minimum": 0
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamo whe the announcement was created"
+          },
+          "dateModified":{
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamo whe the announcement was last modified"
           }
         },
         "required": ["title", "allText", "authorID"],
         "additionalProperties": false      
+      },
+      
+
+      "announcementUpdate": {
+        "$id": "#announcementUpdate",
+        "title": "announcement post Updated",
+        "description": "An updated annoucement post",
+        "type": "object",
+        "properties": {
+          "title":{
+            "type":"string",
+            "description": "Main title of the announcement post",
+            "maxLength": 32
+          },
+          "allText": {
+            "description": "updated body text of the announcement",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false     
       }
     }
   }

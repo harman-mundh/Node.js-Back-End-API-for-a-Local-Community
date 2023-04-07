@@ -169,9 +169,18 @@
       },
 
       "userNotFound":{
+        "$id": "#userDeleted",
+        "title": "User Deleted",
+        "description": "Confirmation of a successful deletion",
+        "type": "object",
+        "properties": {
+          "ID": {
+            "description": "ID of the updated user record",
+            "type": "integer"
+            }
 
+        }
       }
-
     }
-  }
+}
   

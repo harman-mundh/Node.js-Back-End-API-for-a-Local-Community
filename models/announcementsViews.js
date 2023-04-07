@@ -11,7 +11,6 @@
  * 
  * @param {number} id - The ID of the announcemet to add a view to.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */ 
  exports.add = async function add(id) {
    let query = "INSERT INTO announcementViews SET announcementId=?;";
@@ -23,7 +22,6 @@
  * 
  * @param {number} id - The ID of the view to be counted.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */ 
  exports.count = async function count(id) {
    let query = "SELECT count(1) as views FROM announcementViews WHERE announcementId=?;";

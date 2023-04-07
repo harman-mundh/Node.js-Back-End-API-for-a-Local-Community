@@ -32,33 +32,33 @@ ac
   .on('announcements');
 
 exports.create = (requester) => {
-return ac
+  return ac
     .can(requester.role)
     .execute('create')
     .sync()
     .on('announcements');
-}
+  }
 
 exports.read = (requester) => {
-    return ac
-      .can(requester.role)
-      .execute('read')
-      .sync()
-      .on('announcements');
+  return ac
+    .can(requester.role)
+    .execute('read')
+    .sync()
+    .on('announcements');
   }
 
 exports.update = (requester) => {
-return ac
+  return ac
     .can(requester.role)
     .execute('update')
     .sync()
     .on('announcements');
-}
+  }
 
 exports.delete = (requester) => {
-return ac
+  return ac
     .can(requester.role)
     .execute('delete')
     .sync()
     .on('announcements');
-}
+  }

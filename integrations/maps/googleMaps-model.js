@@ -7,40 +7,49 @@
  */
 
 const db = require('../../helpers/database');
-import GmapsAPIkey from '../../config';
 
-/**  ---------------------- FIX ------------------
- * Retrieves a user based on email pattern.
+/**
+ * Retrieves a loaction based on longitude and latitude.
  *
- * @param {object} email - The email of the user to search  for.
+ * @param {number} id - The ID of the location from where to retrive the data from.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
-
-// Get a single location record by its id
 exports.getById = async function getById(id) {
   const query = "SELECT * FROM locations WHERE ID = ?;";
-  const values = [id];
-  const data = await db.run_query(query, values);
+  const data = await db.run_query(query, [id]);
   return data;
 };
 
-// Create a new location record in the database
+/**
+ * Create a loaction instance based on data being passed.
+ *
+ * @param {object} JSON - data containg record to be added in the relative columns.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
 exports.add = async function add(record) {
   const query = "INSERT INTO locations SET ?";
   const data = await db.run_query(query, record);
   return data;
 };
 
-// Delete a location record by its id
-exports.delById = async function delById(id) {
+/**
+ * Delete a loaction instance based on ID.
+ *
+ * @param {number} id - The ID of the Issue to be deleted.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
+exports.deleteById = async function deleteById(id) {
   const query = "DELETE FROM locations WHERE ID = ?;";
-  const values = [id];
-  const data = await db.run_query(query, values);
+  const data = await db.run_query(query, [id]);
   return data;
 };
 
-// Update an existing location record
+/**
+ * Update a loaction based on ID and passed values.
+ *
+ * @param {object} JSON - data being passed to location table to be update along with the instance ID.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
 exports.update = async function update(record) {
   const query = "UPDATE locations SET ? WHERE ID = ?;";
   const values = [record, record.ID];

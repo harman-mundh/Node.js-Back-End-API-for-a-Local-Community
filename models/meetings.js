@@ -12,12 +12,11 @@
  * 
  * @param {number} id - The ID of the meeting to retrieve.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getById = async function getById (id) {
-    const query = "SELECT * FROM meetings WHERE ID = ?;";
-    const values = [id];
-    const data = await db.run_query(query, values);
+    let query = "SELECT * FROM meetings WHERE ID = ?;";
+    let values = [id];
+    let data = await db.run_query(query, values);
     return data;
   }
   
@@ -29,7 +28,6 @@ exports.getById = async function getById (id) {
    * @param {string} order - The column by which to order the results.
    * @param {string} direction - The direction in which to order the results.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.getAll = async function getAll (page, limit, order, direction) {
     const offset = (page - 1) * limit;
@@ -49,7 +47,6 @@ exports.getById = async function getById (id) {
    *
    * @param {object} meeting - The meeting object to added into the database.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.add = async function add (meeting) {
     const query = "INSERT INTO meetings SET ?";
@@ -62,7 +59,6 @@ exports.getById = async function getById (id) {
    *
    * @param {number} id - The ID of the meeting to deleted.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.delById = async function delById (id) {
     const query = "DELETE FROM meetings WHERE ID = ?;";
@@ -76,7 +72,6 @@ exports.getById = async function getById (id) {
    *
    * @param {object} meeting - The updated meeting object.
    * @param {string} meeting.ID - The ID of the article to updated.
-   * @throws {Error} - If the query fails for any reason.
   */
   exports.update = async function update (meeting) {
     const query = "UPDATE meetings SET ? WHERE ID = ?;";

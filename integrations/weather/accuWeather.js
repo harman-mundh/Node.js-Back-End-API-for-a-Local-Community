@@ -8,8 +8,8 @@
  */
 
 const axios = require('axios');
-import {weatherAPIkey, covLocationKey} from '../../config';
-import {getCachedAccuData, putResponseAccuData} from './accuWeather-model';
+const {weatherAPIkey, covLocationKey} = require('../../config');
+const {getCachedAccuData, putResponseAccuData} = require('./accuWeather-model');
 
 /** 
  * Function to return 5 days worth of weather information for Coventry.
@@ -41,4 +41,3 @@ import {getCachedAccuData, putResponseAccuData} from './accuWeather-model';
 
     return weatherData;
 };
-

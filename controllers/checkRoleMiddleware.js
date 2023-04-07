@@ -39,6 +39,3 @@ exports.requireRole = function requireRole(role, isOwner = false) {
         }
       };
     }
-
-//requireRole('admin')
-//requireRole('admin', true) value true if the user is the author of the post[issues and meeting]

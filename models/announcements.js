@@ -12,7 +12,6 @@
  * 
  * @param {number} id - The ID of the announcement to retrieve.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.getById = async function getById (id) {
     const query = "SELECT * FROM announcements WHERE ID = ?;";
@@ -29,7 +28,6 @@ exports.getById = async function getById (id) {
    * @param {string} order - The column by which to order the results.
    * @param {string} direction - The direction in which to order the results.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.getAll = async function getAll (page, limit, order, direction) {
     const offset = (page - 1) * limit;
@@ -49,7 +47,6 @@ exports.getById = async function getById (id) {
    *
    * @param {object} announcement - The announcement object to added into the database.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.add = async function add (announcement) {
     const query = "INSERT INTO announcements SET ?";
@@ -62,7 +59,6 @@ exports.getById = async function getById (id) {
    *
    * @param {number} id - The ID of the announcement to deleted.
    * @returns {Promise} - An array of objects representing the result of the query.
-   * @throws {Error} - If the query fails for any reason.
    */
   exports.delById = async function delById (id) {
     const query = "DELETE FROM announcements WHERE ID = ?;";
@@ -76,7 +72,6 @@ exports.getById = async function getById (id) {
    *
    * @param {object} announcement - The updated issue object.
    * @param {string} announcement.ID - The ID of the announcement to update.
-   * @throws {Error} - If the query fails for any reason.
   */
   exports.update = async function update (announcement) {
     const query = "UPDATE announcements SET ? WHERE ID = ?;";

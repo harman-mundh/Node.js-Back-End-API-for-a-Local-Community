@@ -11,7 +11,6 @@ const db = require('../helpers/database');
  * 
  * @param {number} id - The ID of the issues to add a view to.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */ 
 exports.add = async function add (id) {
   let query = "INSERT INTO issuesViews SET issuesId=?; ";
@@ -19,11 +18,10 @@ exports.add = async function add (id) {
   return result;
 }
 
-/** Count how many issues id the view has stored
+/** Count how many issues id the view table has stored
  * 
  * @param {number} id - The ID of the view to be counted.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */ 
 exports.count = async function count (id) {
   let query = "SELECT count(1) as views FROM issuesViews WHERE issuesId=?;";

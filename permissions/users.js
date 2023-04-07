@@ -42,7 +42,7 @@ exports.readAll = (requester) => { // what is the role and what resource are bei
     .execute('read')  
     .sync()
     .on('users'); 
-}
+  }
 
 exports.read = (requester, data) => {
   return ac
@@ -51,7 +51,7 @@ exports.read = (requester, data) => {
     .execute('read') // perform method
     .sync()
     .on('user'); // resource upon we want to performt the action
-}
+  }
 
 exports.update = (requester, data) => {
   return ac
@@ -60,7 +60,7 @@ exports.update = (requester, data) => {
     .execute('update')
     .sync()
     .on('user');
-}
+  }
 
 exports.delete = (requester, data) => {
   return ac
@@ -69,4 +69,4 @@ exports.delete = (requester, data) => {
     .execute('delete')
     .sync()
     .on('user');
-}
+  }

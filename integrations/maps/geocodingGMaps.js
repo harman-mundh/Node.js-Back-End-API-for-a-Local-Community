@@ -9,18 +9,16 @@
  * @resources Sources: https://developers.google.com/maps/documentation/geocoding/start
  */
 
-import { GmapsAPIkey } from '../../config';
- const axios = require('axios');
+const axios = require('axios');
 
- /** -------------FIX-------------
-  * Retrieves a single issue from the database by its ID.
+ /**
+  * Retrieves a single address from the locations table based on lat and longitude cordinates.
   * 
-  * @param {number} id - The ID of the issue to retrieve.
+  * @param {number} (latitude, longitude) - location data.
   * @returns {Promise} - An array of objects representing the result of the query.
   * @throws {Error} - If the query fails for any reason.
   */
-exports.getGeocodeLatLng = async function getGeocodeLatLng(latitude, longitude) {
-    const apiKey =  GmapsAPIkey; 
+exports.getGeocodeLatLng = async function getGeocodeLatLng(latitude, longitude, apiKey) {
 
     try {
         const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
@@ -34,5 +32,3 @@ exports.getGeocodeLatLng = async function getGeocodeLatLng(latitude, longitude) 
         throw new Error('Error while attempting to fetch data from geocoding api: ', error);
     }
 };
-
- 

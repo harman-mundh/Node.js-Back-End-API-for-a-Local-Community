@@ -26,6 +26,44 @@
       },
       "required": ["allText", "articleID", "authorID"],
       "additionalProperties": false      
+    },
+
+
+    "commentDeleted": {
+      "$id": "/commentDeleted",
+      "title": "Comment Deleted",
+      "description": "A comment posted to an article",
+      "type": "object",
+      "properties": {
+        "allText": {
+          "description": "The comment text",
+          "type": "string"
+        },
+        "articleID": {
+          "description": "ID of the article this comment is about",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+
+
+    "commentNotFound": {
+      "$id": "/commentNotFound",
+      "title": "Comment Not Found",
+      "description": "A comment posted to an article",
+      "type": "object",
+      "properties": {
+        "allText": {
+          "description": "The comment text",
+          "type": "string"
+        },
+        "articleID": {
+          "description": "ID of the article this comment is about",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
     }
   }
 }

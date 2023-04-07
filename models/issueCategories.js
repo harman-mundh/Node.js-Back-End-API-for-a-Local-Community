@@ -13,7 +13,6 @@ const db = require('../helpers/database');
  * @param {number} id - The ID of the issue to add the categories to.
  * @param {number} categoriesID - The ID of the categories to add to the issue.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.add = async function add (id, categoriesID) {
   let query = "INSERT INTO issuecategories SET issueID=?, categoriesID=?";
@@ -28,7 +27,6 @@ exports.add = async function add (id, categoriesID) {
  * @param {number} id - The ID of the issue to remove the categories from.
  * @param {number} categoriesID - The ID of the categories to remove from the issue.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} If the query fails for any reason.
  */
 exports.delete = async function delete_ (id, categoriesID) {
   let query = "DELETE FROM issuecategories WHERE issueID=? AND categoriesID=?;";
@@ -40,7 +38,6 @@ exports.delete = async function delete_ (id, categoriesID) {
  *
  * @param {number} id - The ID of the issue to retrieve the categories for.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} If the query fails for any reason.
  */
 exports.getAll = async function getAll (id) {
   let query = "SELECT c.ID, c.name FROM issuecategories as ac INNER JOIN categories AS c";

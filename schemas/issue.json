@@ -4,7 +4,7 @@
 
       
       "issue": {
-        "$id": "/issue",
+        "$id": "#issue",
         "title": "issue",
         "description": "An issue in the local community",
         "type": "object",
@@ -27,6 +27,16 @@
             "type": "string",
             "format": "uri"
           },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamo whe the issue post was created"
+          },
+          "dateModified":{
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp whe the issue post was last modified"
+          },
           "published": {
             "description": "Is the issue published or not",
             "type": "boolean"
@@ -36,13 +46,74 @@
             "type": "integer",
             "minimum": 0
           },
+          "status":{
+            "type": "string",
+            "enum": ["New", "Work in progress", "Solved"],
+            "description": "The current state/status of the issue post"
+          },
           "locationID": {
             "description": "location ID of the coordinates",
             "type": "integer"
           }
         },
-        "required": ["title", "allText", "authorID"],
+        "required": ["title", "allText", "authorID", "locationID"],
         "additionalProperties": false      
+      },
+
+      "issueUpdate": {
+        "$id": "#issueUpdate",
+        "title": "Issue post Updated",
+        "description": "confirmation of issue data successfully updated",
+        "type": "object",
+        "properties": {
+          "title": {
+            "description": "Main title of the issue",
+            "type": "string",
+            "maxLength": 32
+          },
+          "allText": {
+            "description": "Body text of the issue",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Optional short text summary of issue",
+            "type": "string"
+          },
+          "imageURL": {
+            "description": "URL for main image to show in issue",
+            "type": "string",
+            "format": "uri"
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamo whe the issue post was created"
+          },
+          "dateModified":{
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp whe the issue post was last modified"
+          },
+          "published": {
+            "description": "Is the issue published or not",
+            "type": "boolean"
+          },
+          "authorID": {
+            "description": "User ID of the issue author",
+            "type": "integer",
+            "minimum": 0
+          },
+          "status":{
+            "type": "string",
+            "enum": ["New", "Work in progress", "Solved"],
+            "description": "The current state/status of the issue post"
+          },
+          "locationID": {
+            "description": "location ID of the coordinates",
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false     
       }
     }
   }

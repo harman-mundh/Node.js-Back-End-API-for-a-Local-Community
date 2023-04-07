@@ -13,24 +13,33 @@ const bodyParser = require('koa-bodyparser');
 
 const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/meetings');
-const meetings = require('../models/mettings');
-const meetingsViews = require('../models/mettingsViews');
+const meetings = require('../models/meetings');
+const meetingsViews = require('../models/meetingsViews');
+const locations = require('../integrations/maps/googleMaps-model');
+const getGeocodeLatLng =  require('../integrations/maps/geocodingGMaps');
+const { GmapsAPIkey } = require('../config');
+const {weatherAPIkey, covLocationKey} = require('../config');
 
 // validation schema
-const {validateMeetings, validateLocation} = require('../controllers/validationMiddleware');
+const {validateMeeting, validateMeetingUpdate, validateLocation} = require('../controllers/validationMiddleware');
 
 const prefix_v2 = '/api/v2/meetings';
-const router = Router({prefix: Prefix});
+const router = Router({prefix: prefix_v2});
 
 // meetings routes
 router.get('/', getAll);
-router.get('/:id([0-9]{1,})', getById);
-router.post('/', auth, bodyParser(), validateMeetings, createMeeting);
-router.put('/:id([0-9]{1,})', auth, bodyParser(), validateMeetings, updateMeeting);
+router.get('/:id([0-9]{1,})', auth, getById);
+router.post('/', auth, bodyParser(), validateMeeting ,createMeeting);
+router.put('/:id([0-9]{1,})', auth, validateMeetingUpdate,bodyParser(), updateMeeting);
 router.del('/:id([0-9]{1,})', auth, deleteMeeting);
 
 // views counts
 router.get('/meetings/:id([0-9]{1,})/views', getViewCount);
+
+// geocoding routes
+router.get('/:id([0-9]{1,})/locations', getLocationById);
+router.post('/:id([0-9]{1,})/locations', auth, bodyParser(), validateLocation, addLocation);
+router.del('/:id([0-9]{1,})/locations', auth, deleteLocation)
 
 /**
  * Get all meetings with pagination, ordering, and HATEOAS links.
@@ -40,44 +49,21 @@ router.get('/meetings/:id([0-9]{1,})/views', getViewCount);
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
-async function getAll(ctx) {
+ async function getAll(ctx) {
   try {
-    const {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
+    const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
 
-    // ensure params are integers
-    limit = parseInt(limit);
-    page = parseInt(page);
-    
-    // validate pagination values to ensure they are sensible
-    limit = limit > 100 ? 100 : limit;
-    limit = limit < 1 ? 10 : limit;
-    page = page < 1 ? 1 : page;
+    const issuesData = await meetings.getAll(page, limit, order, direction);
 
-    // ensure order and direction make sense
-    order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
-    direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
-
-    const result = await meetings.getAll(page, limit, order, direction);
-    if (result.length) {
-      const body = result.map(post => {
-        // extract the post fields we want to send back (summary details)
-        const {ID, title, allText, summary, start_time, end_time, authorID, dataCreated, locationID} = post;
-        // add links to the post summaries for HATEOAS compliance
-        // clients can follow these to find related resources
-        const links = {
-          goBack: `${ctx.protocol}://${ctx.host}${prefix_v2}/`,
-          self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}`
-        }
-        return {ID, title,  allText, summary, start_time, end_time, authorID, dataCreated, links, getLocation(locationID)};
-      });
-      ctx.body = body;
+    if (issuesData.length) {
+      ctx.body = issuesData
     } else {
       ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} No meeting posts were found.` };
+      ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to retrive all meeting posts from DB. Details: ${error.message}`};
+    ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all meetings posts from DB. Details: ${error.message}`};
   }
 }
 
@@ -94,9 +80,22 @@ async function getById(ctx) {
     const id = ctx.params.id;
     const result = await meetings.getById(id);
     if (result.length) {
-      await meetingsViews.add(id);  // add a record of being viewed
+      await meetingsViews.add(id);// add a record of being viewed
+
       const meeting = result[0];
-      ctx.body = meeting;
+    
+      // get location data
+      const location = await locations.getLocationById(meeting.locationID);
+      if (location.length) {
+      const {latitude, longitude} = location[0];
+
+      // pass to Geocoding api 
+      const geocodingResponse = await getGeocodeLatLng(latitude, longitude, GmapsAPIkey);
+
+      issue.geocodingResponse = geocodingResponse;
+    }
+
+      ctx.body = meeting ;
     } else {
       ctx.status = 404;
       ctx.body = { error: `Error: ${ctx.status} Meeting not found.` };
@@ -226,3 +225,86 @@ async function getViewCount(ctx) {
     ctx.body = { error: `Error: ${ctx.status} while trying to viwe count of the post. Details: ${error.message}` };
   }
 }
+
+/**
+ * Get Locations for the meeting Post by its ID. 
+ * 
+ * @param {Object} ctx - Koa context object
+ * @throws {Object} 404 - Not found
+ * @throws {Object} 500 - Internal Server Error
+ * @returns {Object} JSON - Location related to the meeting post
+ */
+ async function getLocationById(ctx) {
+  try{
+    const id = ctx.params.id;
+    const result = await locations.getById(id);
+    if (result.length) {
+      ctx.body = result;
+      } else {
+        ctx.status = 404;
+        ctx.body = { error: `Error: ${ctx.status} No Locations were found for this meeting post.` };
+      }
+    } catch (error) {
+      ctx.body = { error: `Error: ${ctx.status} while trying to retrive locations data for the post. Details: ${error.message}`};
+    }
+  }
+  
+/**
+ * Add a category to a meeting Post.  
+ * 
+ * @param {Object} ctx - Koa context object
+ * @throws {Object} 400 - Bad Request
+ * @throws {Object} 500 - Internal Server Error
+ * @returns {Object} 201 - Success: boolean True
+ */
+async function addLocation(ctx) {
+  try {
+    const { latitude, longitude } = ctx.request.body;
+    const result = await locations.add(latitude, longitude);
+    const locationID = result.insertId;
+
+    const meetingID = ctx.params.id;
+    const updateResult = await meetings.updateLocation(meetingID, locationID);
+
+    if (updateResult.affectedRows) {
+      ctx.status = 201;
+      ctx.body = { added: true, locationID: locationID };
+    } else {
+      ctx.status = 400;
+      ctx.body = { error: `Error: ${ctx.status} failed to add location to the isses` };
+    }
+  } catch (error) {
+    ctx.body = { error: `Error: ${ctx.status} while trying to add location to the meeting. Details: ${error.message}`};
+  }
+}
+
+/**
+ * Remove a location from a meeing Post. 
+ * 
+ * @param {Object} ctx - Koa context object
+ * @throws {Object} 404 - Not found
+ * @throws {Object} 500 - Internal Server Error
+ * @returns {string|boolean} JSON - Delete: boolean value
+ */
+async function deleteLocation(ctx) {
+  try {
+    const meetingID = ctx.params.id;
+    const result = await meetings.getById(meetingID);
+
+    if (result.lenght) {
+      const locationID = result[0].locationID;
+      const deleteLocation = await locations.deleteById(locationID);
+
+      if (deleteLocation.affectedRows){
+        ctx.body = { delete: true};
+      } else {
+        ctx.status = 404;
+        ctx.body = { error: `Error: ${ctx.status} location ID not found`};
+      }
+    }
+  }catch (error) {
+      ctx.body = { error: `Error: ${ctx.status} while trying to delete location from DB. Details: ${error.message}` };
+    }
+  }
+
+module.exports = router;

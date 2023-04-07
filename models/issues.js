@@ -5,6 +5,7 @@
  * @author Harman Singh
  */
 
+const { Query } = require('role-acl');
 const db = require('../helpers/database');
 
 /**
@@ -49,7 +50,6 @@ exports.getAll = async function getAll (page, limit, order, direction) {
  *
  * @param {object} issue - The issue object to added into the database.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.add = async function add (issue) {
   const query = "INSERT INTO issues SET ?";
@@ -62,7 +62,6 @@ exports.add = async function add (issue) {
  *
  * @param {number} id - The ID of the issue to deleted.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.delById = async function delById (id) {
   const query = "DELETE FROM issues WHERE ID = ?;";
@@ -75,8 +74,7 @@ exports.delById = async function delById (id) {
  * Update an existing issue in the database by its ID.
  *
  * @param {object} issue - The updated issue object.
- * @param {string} issue.ID - The ID of the article to updated.
- * @throws {Error} - If the query fails for any reason.
+ * @param {string} issue.ID - The ID of the issue post to updated.
 */
 exports.update = async function update (issue) {
   const query = "UPDATE issues SET ? WHERE ID = ?;";

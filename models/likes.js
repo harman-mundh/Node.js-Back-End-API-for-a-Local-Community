@@ -12,7 +12,6 @@ const db = require('../helpers/database');
  * @param {number} id - The ID of the issue to add a like record for.
  * @param {number} uid - The ID of the user who is liking the issue.
  * @returns {Promis} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.like = async function like (id, uid) {
   let query = "INSERT INTO issueLikes SET issueID=?, userID=? ON DUPLICATE KEY UPDATE issueID=issueID; ";
@@ -26,7 +25,6 @@ exports.like = async function like (id, uid) {
  * @param {number} id - The ID of the issue to remove the like record for.
  * @param {number} uid - The ID of the user who is removing the like from the issue.
  * @returns {Promise} - An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.dislike = async function dislike (id, uid) {
   let query = "DELETE FROM issueLikes WHERE issueID=? AND userID=?; ";
@@ -39,7 +37,6 @@ exports.dislike = async function dislike (id, uid) {
  *
  * @param {number} id - The ID of the issue to count the likes for.
  * @returns {Promise} An array of objects representing the result of the query.
- * @throws {Error} - If the query fails for any reason.
  */
 exports.count = async function count (id) {
   let query = "SELECT count(1) as likes FROM issueLikes WHERE issueID=?;";
