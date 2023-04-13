@@ -60,6 +60,7 @@ exports.getAll = async function getAll (limit=10, page=1) {
   return data;
 }
 
+
 /**
  * Add a new user in the database.
  *
@@ -73,21 +74,6 @@ exports.add = async function add (user) {
   const hash = bcrypt.hashSync(password, 10);
   user.password = hash;
   const data = await db.run_query(query, user);
-  return data;
-}
-
-/**
- * Delete a user by specified ID.
- *
- * @param {number} id - The ID of the user to be deleted.
- * @function {number} id - call function to perform soft delete.
- * @returns {Promise} - An array of objects representing the result of the query.
- */
-exports.delById = async function delById (id) {
-  await updateAuthorID(id);
-  const query = "DELETE FROM users WHERE ID = ?;";
-  const values = [id];
-  const data = await db.run_query(query, values);
   return data;
 }
 
@@ -110,6 +96,25 @@ exports.update = async function update (user) {
 }
 
 /**
+ * Delete a user by specified ID.
+ *
+ * @param {number} id - The ID of the user to be deleted.
+ * @function {number} id - call function to perform soft delete.
+ * @returns {Promise} - An array of objects representing the result of the query.
+ */
+ exports.delById = async function delById (id) {
+  const issueCount = await getIssuesByAuthorId(id);
+  if (issueCount > 0) {
+      await updateAuthorId(id);
+  }
+
+  const query = "DELETE FROM users WHERE ID = ?;";
+  const values = [id];
+  const data = await db.run_query(query, values);
+  return data;
+}
+
+/**
  * Function used to preserve data on the API,
  * before a user is delete all their post are 
  * trasfered to placeholder user deletedUser (soft Delete the user)
@@ -117,9 +122,23 @@ exports.update = async function update (user) {
  * @param {object} ID - user ID  
  * @returns {Promise} - An array of objects representing the result of the query
  */
- updateAuthorID = async function updateAuthorID(id) {
+async function updateAuthorId(id) {
   const query = "UPDATE issues SET authorID = 2 WHERE authorID = ?;";
   const values = [id];
   const data = await  db.run_query(query, values);
   return data;
  };
+
+ /**
+ * Function used to preserve data on the API,
+ * before a user is delete all their post are counted
+ * 
+ * @param {object} ID - user ID  
+ * @returns {number} - count post by the author if any
+ */
+async function getIssuesByAuthorId(id) {
+  const query = "SELECT COUNT(*) as issue_count FROM issues WHERE authorID = ?;";
+  const values = [id];
+  const data = await  db.run_query(query, values);
+  return data[0].issue_count;
+  };

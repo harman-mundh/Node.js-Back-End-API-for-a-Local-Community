@@ -13,7 +13,7 @@ const db = require('../helpers/database');
  * @returns {Promise} - An array of objects representing the result of the query.
  */ 
 exports.add = async function add (id) {
-  let query = "INSERT INTO issuesViews SET issuesId=?; ";
+  let query = "INSERT INTO issueViews SET issueId=?; ";
   const result = await db.run_query(query, [id]);
   return result;
 }

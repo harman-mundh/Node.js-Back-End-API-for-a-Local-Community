@@ -21,7 +21,9 @@ const commonUserRoutes = function commonUserRoutes (prefix) {
 
   router.get('/', auth, getAll); // check permissions and require authentication 
   router.post('/', bodyParser(), validateUser, createUser);
-  router.get('/:id', auth, getById); //([0-9]{1,})
+  router.get('/:id([0-9]{1,})', auth, getById); 
+  router.get('/:id([a-zA-Z0-9-_]+)', auth, getByUsername);
+  router.get('/:id([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', auth, getByEmail);
   router.put('/:id([0-9]{1,})', auth, bodyParser(), validateUserUpdate, updateUser);
   router.del('/:id([0-9]{1,})', auth, deleteUser);
 
@@ -32,6 +34,7 @@ const commonUserRoutes = function commonUserRoutes (prefix) {
  * Get all users with pagination and filtering by fields.
  * 
  * @param {Object} ctx - Koa context object
+ * @returns {JSON} 
  */
 async function getAll(ctx) {
   const permission = can.readAll(ctx.state.user);
@@ -79,10 +82,95 @@ async function getAll(ctx) {
  * 
  * @param {Object} ctx - Koa context object
  * @param {Function} next - Koa next middleware
+ * @return {object} response - all user details
  */
 async function getById(ctx, next) {
   const id = ctx.params.id;
-  const result = await users.getByUsername(id);
+  const result = await users.getById(id);
+  if (result.length) {
+    const data = result[0]
+    const permission = can.read(ctx.state.user, data);
+    if (!permission.granted) {
+      ctx.status = 403;
+    } else {
+      console.log(ctx.headers);
+
+      const body = permission.filter(data);
+      const Etag = etag(JSON.stringify(body));
+      const modified = new Date(data.modified);
+
+      let is304 = false;
+
+      const {['if-none-match']:if_none_match} = ctx.headers;
+      if (if_none_match === Etag) is304 = true;
+      
+      const {['if-modified-since']:if_modified_since} = ctx.headers;
+      if (modified < Date.parse(if_modified_since)) is304 = true;
+
+      if (is304) {
+        ctx.status = 304;
+        return next();
+      }
+
+      ctx.body = body;
+      ctx.set('Last-Modified', modified.toUTCString());
+      ctx.set('Etag', Etag);
+    }
+  }
+}
+
+/**
+ * Get a user by their ID.
+ * 
+ * @param {Object} ctx - Koa context object
+ * @param {Function} next - Koa next middleware
+ * @return {object} response - all user details
+ */
+ async function getByUsername(ctx, next) {
+  const username = ctx.params.id;
+  const result = await users.findByUsername(username);
+  if (result.length) {
+    const data = result[0]
+    const permission = can.read(ctx.state.user, data);
+    if (!permission.granted) {
+      ctx.status = 403;
+    } else {
+      console.log(ctx.headers);
+
+      const body = permission.filter(data);
+      const Etag = etag(JSON.stringify(body));
+      const modified = new Date(data.modified);
+
+      let is304 = false;
+
+      const {['if-none-match']:if_none_match} = ctx.headers;
+      if (if_none_match === Etag) is304 = true;
+      
+      const {['if-modified-since']:if_modified_since} = ctx.headers;
+      if (modified < Date.parse(if_modified_since)) is304 = true;
+
+      if (is304) {
+        ctx.status = 304;
+        return next();
+      }
+
+      ctx.body = body;
+      ctx.set('Last-Modified', modified.toUTCString());
+      ctx.set('Etag', Etag);
+    }
+  }
+}
+
+/**
+ * Get a user by their ID.
+ * 
+ * @param {Object} ctx - Koa context object
+ * @param {Function} next - Koa next middleware
+ * @return {object} response - all user details
+ */
+ async function getByEmail(ctx, next) {
+  const email = ctx.params.id;
+  const result = await users.emailSearch(email);
   if (result.length) {
     const data = result[0]
     const permission = can.read(ctx.state.user, data);
@@ -119,6 +207,7 @@ async function getById(ctx, next) {
  * Create a new user.
  * 
  * @param {Object} ctx - Koa context object
+ * @return {object} response - ID, created boolean true, and HATEOAS link 
  */
 async function createUser(ctx) {
   const body = ctx.request.body;
@@ -134,6 +223,7 @@ async function createUser(ctx) {
  * Update an existing user by their ID.
  * 
  * @param {Object} ctx - Koa context object
+ * @return {object} response - ID, updated boolean true, and HATEOAS link 
  */
 async function updateUser(ctx) {
   const id = ctx.params.id;
@@ -159,6 +249,7 @@ async function updateUser(ctx) {
  * Delete a user by their ID.
  * 
  * @param {Object} ctx - Koa context object
+ * @return {object} response - ID and deleted boolean true
  */
 async function deleteUser(ctx) {
   const id = ctx.params.id;

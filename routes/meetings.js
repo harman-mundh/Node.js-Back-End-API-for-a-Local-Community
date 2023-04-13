@@ -29,7 +29,7 @@ const router = Router({prefix: prefix_v2});
 // meetings routes
 router.get('/', getAll);
 router.get('/:id([0-9]{1,})', auth, getById);
-router.post('/', auth, bodyParser(), validateMeeting ,createMeeting);
+router.post('/', auth, bodyParser(), validateMeeting, createMeeting);
 router.put('/:id([0-9]{1,})', auth, validateMeetingUpdate,bodyParser(), updateMeeting);
 router.del('/:id([0-9]{1,})', auth, deleteMeeting);
 
@@ -102,7 +102,7 @@ async function getById(ctx) {
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to dislike the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while retrive the meeting post by its ID. Details: ${error.message}` };
   }
 }
 
@@ -128,7 +128,7 @@ async function createMeeting(ctx) {
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to dislike the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to create the post. Details: ${error.message}` };
   }
 }
 

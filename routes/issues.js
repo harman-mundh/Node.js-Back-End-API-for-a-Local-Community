@@ -119,7 +119,7 @@ async function getAll(ctx) {
         ctx.body = { error: `Error: ${ctx.status} Issue not found.` };
       }
     } catch (error) {
-      ctx.body = { error: `Error: ${ctx.status} while trying to dislike the post. Details: ${error.message}` };
+      ctx.body = { error: `Error: ${ctx.status} while trying to get post by ID. Details: ${error.message}` };
     }
   }
 

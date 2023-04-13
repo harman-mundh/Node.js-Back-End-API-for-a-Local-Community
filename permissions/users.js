@@ -1,18 +1,31 @@
+/**
+ * A module to set permission on user and admin and actions 
+ * that each role can perfom on route users
+ * 
+ * @module permissions/users
+ * @author Harman Singh
+ */
+
 const AccessControl = require('role-acl');
 const ac = new AccessControl();
 
-// controls for CRUD operations on user records
 ac
   .grant('user')
-  .condition({Fn:'EQUALS', args: {'requester':'$.owner'}}) // if requester is the owner
-  .execute('read')                                          // action to read
-  .on('user', ['*', '!password', '!passwordSalt']);        // all of the resources save but not the passwords
+  .condition({Fn:'EQUALS', args: {'requester':'$.owner'}}) 
+  .execute('read')                                          
+  .on('user', ['*', '!password', '!passwordSalt']);        
 
 ac
   .grant('user')
   .condition({Fn:'EQUALS', args: {'requester':'$.owner'}})
   .execute('update')
   .on('user', ['firstName', 'lastName', 'about', 'password', 'email', 'avatarURL']);
+
+ac
+  .grant('user')
+  .condition({Fn:'EQUALS', args: {'requester':'$.owner'}}) 
+  .execute('delete')                                          
+  .on('user');
 
 ac
   .grant('admin')
@@ -35,8 +48,8 @@ ac
   .execute('delete')
   .on('user');
 
-
-exports.readAll = (requester) => { // what is the role and what resource are being accessed, not the date it self
+exports.readAll = (requester) => { 
+  
   return ac
     .can(requester.role) 
     .execute('read')  
@@ -45,15 +58,17 @@ exports.readAll = (requester) => { // what is the role and what resource are bei
   }
 
 exports.read = (requester, data) => {
+
   return ac
-    .can(requester.role) // can this role (property in db)
-    .context({requester:requester.ID, owner:data.ID}) // details about the request
-    .execute('read') // perform method
+    .can(requester.role) 
+    .context({requester:requester.ID, owner:data.ID}) 
+    .execute('read') 
     .sync()
-    .on('user'); // resource upon we want to performt the action
+    .on('user');
   }
 
 exports.update = (requester, data) => {
+
   return ac
     .can(requester.role)
     .context({requester:requester.ID, owner:data.ID})
@@ -63,6 +78,7 @@ exports.update = (requester, data) => {
   }
 
 exports.delete = (requester, data) => {
+
   return ac
     .can(requester.role)
     .context({requester:requester.ID, owner:data.ID})
