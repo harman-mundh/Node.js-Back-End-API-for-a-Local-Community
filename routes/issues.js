@@ -36,7 +36,7 @@ router.get('/', getAll);
 router.post('/', auth, bodyParser(), validateIssue, createIssue); 
 router.get('/:id([0-9]{1,})', auth, getById);
 router.put('/:id([0-9]{1,})', auth, bodyParser(), validateIssue, updateIssue); 
-router.put('/issues/:id/solve', auth, updateIssueStatus)
+router.put('/:id([0-9]{1,})/solve', auth, updateIssueStatus)
 router.del('/:id([0-9]{1,})', auth, deleteIssue); 
 
 // likes routes
@@ -69,21 +69,49 @@ router.del('/:id([0-9]{1,})/locations', auth, deleteLocation)
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
-async function getAll(ctx) {
-  try {
-    const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
+// async function getAll(ctx) {
+//   try {
+//     const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
 
-    const issuesData = await issues.getAll(page, limit, order, direction);
-    ctx.body = issuesData;
-    if (issuesData.length) {
-      ctx.body = issuesData;
-    } else {
-      ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
-    }
-  } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all announcements posts from DB. Details: ${error.message}`};
+//     const issuesData = await issues.getAll(page, limit, order, direction);
+//     ctx.body = issuesData;
+//     if (issuesData.length) {
+//       ctx.body = issuesData;
+//     } else {
+//       ctx.status = 404;
+//       ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
+//     }
+//   } catch (error) {
+//     ctx.status = 500;
+//     ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all announcements posts from DB. Details: ${error.message}`};
+//   }
+// }
+
+async function getAll(ctx) {
+  let {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
+
+  // ensure params are integers
+  limit = parseInt(limit);
+  page = parseInt(page);
+  
+  // validate pagination values to ensure they are sensible
+  limit = limit > 100 ? 100 : limit;
+  limit = limit < 1 ? 10 : limit;
+  page = page < 1 ? 1 : page;
+
+  // ensure order and direction make sense
+  order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
+  direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
+
+  const result = await meetings.getAll(page, limit, order, direction);
+  if (result.length) {
+    const body = result.map(post => {
+      // extract the post fields we want to send back (summary details)
+      const {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID} = post;
+
+      return {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID};
+    });
+    ctx.body = body;
   }
 }
 

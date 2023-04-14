@@ -41,7 +41,7 @@
       "announcementUpdate": {
         "$id": "#announcementUpdate",
         "title": "announcement post Updated",
-        "description": "An updated annoucement post",
+        "description": "Data that can be updated on annoucement post",
         "type": "object",
         "properties": {
           "title":{
@@ -55,6 +55,68 @@
           }
         },
         "additionalProperties": false     
+      },
+      "userList": {
+        "$id": "#userList",
+        "title": "User List",
+        "description": "List of all users visible to admin only.",
+        "type": "array",
+        "items": {"$ref": "#/definitions/userView"}
+      },
+      
+      
+      "annoucementUpdated": {
+        "$id": "#annoucementUpdated",
+        "title": "User Updated",
+        "description": "Confirmation of a successful user update/creation",
+        "type": "object",
+        "properties": {
+          "ID": {
+            "description": "ID of the updated user record",
+            "type": "integer"
+          },
+          "updated": {
+            "description": "Boolean indicator of success",
+            "type": "boolean"
+          },
+          "link": {
+            "description": "Path to retrieve user record",
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      
+      
+      "userDeleted": {
+        "$id": "#userDeleted",
+        "title": "User Deleted",
+        "description": "Confirmation of a successful deletion",
+        "type": "object",
+        "properties": {
+          "ID": {
+            "description": "ID of the updated user record",
+            "type": "integer"
+          },
+          "deleted": {
+            "description": "Boolean indicator of success",
+            "type": "boolean"
+          }
+        }
+      },
+
+      "userNotFound":{
+        "$id": "#userDeleted",
+        "title": "User Deleted",
+        "description": "Confirmation of a successful deletion",
+        "type": "object",
+        "properties": {
+          "ID": {
+            "description": "ID of the updated user record",
+            "type": "integer"
+            }
+
+        }
       }
     }
   }

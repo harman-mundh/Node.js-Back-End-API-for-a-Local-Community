@@ -24,14 +24,13 @@ const router = Router({prefix: prefix_v2});
 
 // announcements routes
 router.get('/', getAll);
-router.get('/:id([0-9]{1,})', getById);
+router.get('/:id([0-9]{1,})', auth, getById);
 router.post('/', auth, bodyParser(), validateAnnoucement, createAnnouncement);
 router.put('/:id([0-9]{1,})', auth, bodyParser(), validateAnnoucementUpdate, updateAnnouncement);
 router.del('/:id([0-9]{1,})', auth, deleteAnnouncement);
 
 // views counts
 router.get('/announcements/:id([0-9]{1,})/views', getViewCount);
-
 
 /**
  * Get all Announcements with pagination, ordering, and HATEOAS links.
@@ -41,21 +40,36 @@ router.get('/announcements/:id([0-9]{1,})/views', getViewCount);
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
-async function getAll(ctx) {
-  try {
-    const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
+ async function getAll(ctx) {
+  let {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
 
-    const issuesData = await announcements.getAll(page, limit, order, direction);
-    ctx.body = issuesData;
-    if (issuesData.length) {
-      ctx.body = issuesData;
-    } else {
-      ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
-    }
-  } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all announcements posts from DB. Details: ${error.message}`};
+  // ensure params are integers
+  limit = parseInt(limit);
+  page = parseInt(page);
+  
+  // validate pagination values to ensure they are sensible
+  limit = limit > 100 ? 100 : limit;
+  limit = limit < 1 ? 10 : limit;
+  page = page < 1 ? 1 : page;
+
+  // ensure order and direction make sense
+  order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
+  direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
+
+  const result = await announcements.getAll(page, limit, order, direction);
+  if (result.length) {
+    const body = result.map(post => {
+      // extract the post fields we want to send back (summary details)
+      const {ID, title, allText, dateCreated, authorID} = post;
+
+      const links = {
+        views: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}/views`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}`
+      }
+      
+      return {ID, title, allText, dateCreated, authorID, links};
+    });
+    ctx.body = body;
   }
 }
 
@@ -65,6 +79,7 @@ async function getAll(ctx) {
  * @param {Object} ctx - Koa context object
  * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
+* @returns {Object} 200 - Success response
  * @returns {Object} JSON - Announcement post body with attributes
  */
 async function getById(ctx) {
@@ -74,14 +89,24 @@ async function getById(ctx) {
     if (result.length) {
       await announcementsViews.add(id);  // add a record of being viewed
       const announcement = result[0];
-      ctx.body = announcement;
+
+      const links = {
+        goBack: `${ctx.protocol}://${ctx.host}${prefix_v2}`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${announcement.ID}`
+      }
+
+      ctx.body = {
+        announcement: announcement,
+        links: links
+      };
+
     } else {
       ctx.status = 404;
       ctx.body = { error: `Error: ${ctx.status} Announcement not found.` };
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to dislike the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to retrive the post. Details: ${error.message}` };
   }
 }
 
@@ -91,11 +116,19 @@ async function getById(ctx) {
  * @param {Object} ctx - Koa context object
  * @throws {Object} 400 - Bad Request
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} 201 - Success response
+ * @returns {Object} 200 - Success response
  */
 async function createAnnouncement(ctx) {
   try {
-    const body = ctx.request.body; // bodyParser
+    const body = ctx.request.body;
+    const permission = can.create(ctx.state.user);
+
+    if (!permission.granted) {
+      ctx.status = 403;
+      ctx.body = {error: "You don't have permission to create on annoucements"};
+      return;
+    }
+
     const result = await announcements.add(body);
     if (result.affectedRows) {
       const id = result.insertId;
@@ -107,7 +140,7 @@ async function createAnnouncement(ctx) {
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to dislike the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to create the annoucement post. Details: ${error.message}` };
   }
 }
 
@@ -117,37 +150,33 @@ async function createAnnouncement(ctx) {
  * @param {Object} ctx - Koa context object
  * @throws {Object} 403 - Forbidden
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} 201 - Success response
+ * @returns {Object} 200 - Success response
  */
 async function updateAnnouncement(ctx) {
-  try {
+  try{
     const id = ctx.params.id;
-    let result = await announcements.getById(id);  // check it exists
+    let result = await announcements.getById(id);  
     if (result.length) {
-      let announcement = result[0];
-      const permission = can.update(ctx.state.user, announcement);
+      let data = result[0];
+      const permission = can.update(ctx.state.user, data);
       if (!permission.granted) {
         ctx.status = 403;
+        ctx.body = {error: "You don't have permission to update on annoucements"};
       } else {
-        // exclude fields that should not be updated
-        const {ID, dateCreated, dateModified, authorID, ...body} = ctx.request.body;
-        // overwrite updatable fields with remaining body data
-        Object.assign(announcement, body);
-        result = await announcement.update(announcement);
+        const newData = permission.filter(ctx.request.body);
+        Object.assign(newData, {ID: id}); 
+        result = await announcements.update(newData);
         if (result.affectedRows) {
           ctx.body = {ID: id, updated: true, link: ctx.request.path};
         } else {
-          ctx.status = 400;
-          ctx.body = { error: `Error: ${ctx.status} Failed to update the update.` };
+          ctx.status = 404;
+          ctx.body = { error: `Error: ${ctx.status} Announcement not found.` };
         }
       }
-    } else {
-      ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} Announcement not found.` };
     }
   } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to update the post. Details: ${error.message}` };
+      ctx.status = 500;
+      ctx.body = {error: `Error: ${ctx.status} while trying to update the annoucement post. ${error.message}`};
   }
 }
 
@@ -158,6 +187,7 @@ async function updateAnnouncement(ctx) {
  * @throws {Object} 403 - Forbidden
  * @throws {Object} 404 - Not Found
  * @throws {Object} 500 - Internal Server Error
+ * @returns {Object} 200 - Success response
  * @returns {number|boolean} JSON - ID and boolean value
  */
 async function deleteAnnouncement(ctx) {
@@ -165,6 +195,7 @@ async function deleteAnnouncement(ctx) {
   const permission = can.delete(ctx.state.user);
     if (!permission.granted) {
       ctx.status = 403;
+      ctx.body = {error: "You don't have permission to delete on annoucements"};
     } else {
       const id = ctx.params.id;
       const result = await announcements.delById(id);
@@ -177,7 +208,7 @@ async function deleteAnnouncement(ctx) {
       }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to update the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to delete the annoucement. Details: ${error.message}` };
   }
 }
   
@@ -201,7 +232,7 @@ async function getViewCount(ctx) {
     }
   } catch (error){
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to viwe count of the post. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to view count of the post. Details: ${error.message}` };
   }
 }
 

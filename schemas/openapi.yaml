@@ -10,25 +10,28 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://outsidefilter-epoxyderby-8080.codio-box.uk/api/v1'
-    description: Development server
+  - url: 'https://outsidefilter-epoxyderby-3000.codio-box.uk/api/v1'
+    description: Development server (v1)
+  - url: 'https://outsidefilter-epoxyderby-3000.codio-box.uk/api/v2'
+    description: Development server (v2)
 tags:
-  - name: Speacial
+  - name: Root
     description: API endpoints for testing versioning and Auth
   - name: Users
     description: API endpoints for user management.
   - name: Issues
-    description: Access and perform CRUD operations on issues entries.
+    description: API endpoint to perform CRUD operations on issues entries.
   - name: Comments
-    description:
+    description: API endpoint to perform CRUD operations on comments entries
   - name: Categories
-    description:
+    description: API endpoint to perform CRUD operations on categories entries
   - name: Announcements
-    description:
+    description: API endpoint to perform CRUD operations on announcement entries.
   - name: Meetings
-    description:
+    description: API endpoint to perform CRUD operations on meeting entries.
+
 paths:
-  /special:
+  /api/v1:
     summary:
     description: >
       This resource represents the basic API endpoints used to test the versioning 
@@ -42,6 +45,7 @@ paths:
         '200':
           description: View of user record
 
+  /api/v2:
     get:
       tags:
         - api/v2
@@ -51,6 +55,7 @@ paths:
         '200':
           description: Show api public message
 
+  /api/v1/private:
     get:
       tags:
         - api/v1/private
@@ -60,6 +65,7 @@ paths:
         '200':
           description: Show api private message only available after Auth
 
+  /api/v2/private:
     get:
       tags:
         - api/v2/private
@@ -172,340 +178,302 @@ paths:
         '404':
           description: Not found
 
-  /issues:
-    summary: Rappresents meetings posts on the database
-    description: >
-      This resource represents an issue post in the system.
-      Each post is identified by a numeric `id`.
-    get:
-      tags:
-        - meetings
-      description:
-        Get all issues.
-      responses:
-        '200':
-          description: View all issues record
-          content:
-            application/json:
-              schema:
-                $ref: ./issue.json#/definitions/issues
-        '401':
-          description: Non-admin users can all data
-        '404':
-          description: Not found
+  # /issues:
+  #   summary: Rappresents meetings posts on the database
+  #   description: >
+  #     This resource represents an issue post in the system.
+  #     Each post is identified by a numeric `id`.
+  #   get:
+  #     tags:
+  #       - meetings
+  #     description:
+  #       Get all issues.
+  #     responses:
+  #       '200':
+  #         description: View all issues record
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: ./issue.json#/definitions/issues
+  #       '401':
+  #         description: Non-admin users can all data
+  #       '404':
+  #         description: Not found
 
-    post:
-      tags:
-        - Issues
-      description:
-        Create a Issue Post.
-      requestBody:
-        description: All issues post body data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./issues.json#/definitions/issues
-      responses:
-        '201':
-          description: Issue post created
-          content:
-            application/json:
-              schema:
-                $ref: ./issues.json#/definitions/issues
+  #   post:
+  #     tags:
+  #       - Issues
+  #     description:
+  #       Create a Issue Post.
+  #     requestBody:
+  #       description: All issues post body data.
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: ./issues.json#/definitions/issues
+  #     responses:
+  #       '201':
+  #         description: Issue post created
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: ./issues.json#/definitions/issues
 
-  /issues/{id}:
-    parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
-        description: Numeric id of the issues post
-    get:
-      tags:
-        - Issues
-      description:
-        Get issues by id.
-      responses:
-        '200':
-          description: View of issue record
-          content:
-            application/json:
-              schema:
-                $ref: ./issues.json#/definitions/issues
-        '401':
-          description: Non-admin users can view their any data
-        '404':
-          description: Not foundd
+  # /issues/{id}:
+  #   parameters:
+  #     - in: path
+  #       name: id
+  #       schema:
+  #         type: integer
+  #       required: true
+  #       description: Numeric id of the issues post
+  #   get:
+  #     tags:
+  #       - Issues
+  #     description:
+  #       Get issues by id.
+  #     responses:
+  #       '200':
+  #         description: View of issue record
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: ./issues.json#/definitions/issues
+  #       '401':
+  #         description: Non-admin users can view their any data
+  #       '404':
+  #         description: Not foundd
 
-    put:
-      tags:
-        - Issues
-      description:
-        Update issue post by id.
-      requestBody:
-        description: Update a visible property.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./issues.json#/definitions/issueUpdate
-      responses:
-        '200':
-          description: Confirmation and link to record.
-          content:
-            application/json:
-              schema:
-                $ref: ./issue.json#/definitions/issueUpdated
-        '404':
-          description: Not found
+  #   put:
+  #     tags:
+  #       - Issues
+  #     description:
+  #       Update issue post by id.
+  #     requestBody:
+  #       description: Update a visible property.
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: ./issues.json#/definitions/issueUpdate
+  #     responses:
+  #       '200':
+  #         description: Confirmation and link to record.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: ./issue.json#/definitions/issueUpdated
+  #       '404':
+  #         description: Not found
 
-  /announcements:
-    summary:
-    description:
-
-    summary: Rappresents Announcement posts on the database
-    description: >
-      This resource represents an annoucement post in the system.
-      Each post is identified by a numeric value `id`.
-    get:
-      tags:
-        - Announcement
-      description:
-        Get annoucement by id.
-      responses:
-        '200':
-          description: View of announcement record
-          content:
-            application/json:
-              schema:
-                $ref: ./announcement.json#/definitions/announcementView
-        '401':
-          description: Non-admin users can only view their own record
-        '404':
-          description: Not found
-
-    get:
-      tags:
-        - Announcement
-      description:
-        Get Announcement by id.
-      responses:
-        '200':
-          description: View of Announcement record
-          content:
-            application/json:
-              schema:
-                $ref: ./announcement.json#/definitions/announcementView
-        '401':
-          description: Non-admin users can only view their own record
-        '404':
-          description: Not found
+#   /v2/announcements:
+#     summary: Rappresents Announcement posts on the database
+#     description: >
+#       This resource represents an annoucement post in the system.
+#       Each post is identified by a numeric value `id`.
+#     get:
+#       tags:
+#         - Announcement
+#       description:
+#         Get annoucement by id.
+#       responses:
+#         '200':
+#           description: View of announcement record
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./announcement.json#/definitions/announcementView
+#         '401':
+#           description: Non-admin users can only view their own record
+#         '404':
+#           description: Not found
     
-    post:
-      tags:
-        - Announcement
-      description:
-        Create a new Announcement post.
-      requestBody:
-        description: All new user data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./announcement.json#/definitions/announcement
-      responses:
-        '201':
-          description: Announcement created
-          content:
-            application/json:
-              schema:
-                $ref: ./announcement.json#/definitions/announcementUpdated
+#     post:
+#       tags:
+#         - Announcement
+#       description:
+#         Create a new Announcement post.
+#       requestBody:
+#         description: All new user data.
+#         required: true
+#         content:
+#           application/json:
+#             #schema:
+#               #$ref: ./announcement.json#/definitions/announcement
+#       responses:
+#         '201':
+#           description: Announcement created
+#           #content:
+#             #application/json:
+#               #schema:
+#                 #$ref: ./announcement.json#/definitions/announcementUpdated
 
-    put:
-      tags:
-        - Announcement
-      description:
-        Update user by id.
-      requestBody:
-        description: Update a visible property or the password.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: .announcement.json#/definitions/announcementUpdate
-      responses:
-        '200':
-          description: Confirmation and link to record.
-          content:
-            application/json:
-              schema:
-                $ref: ./announcement.json#/definitions/announcementUpdated
-        '404':
-          description: Not found
-
-  /meetings:
-    summary:
-    description:
-
-    summary: Rappresents Meetings posts on the database
-    description: >
-      This resource represents an issue post in the system.
-      Each post is identified by a numeric `id`.
-    get:
-      tags:
-        - Meetings
-      description:
-        Get user by id.
-      responses:
-        '200':
-          description: View of user record
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetings
-        '401':
-          description: Non-admin users can only view their own record
-        '404':
-          description: Not found
-
-    get:
-      tags:
-        - Meetings
-      description:
-        Get user by id.
-      responses:
-        '200':
-          description: View of user record
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetings
-        '401':
-          description: Non-admin users can only view their own record
-        '404':
-          description: Not found
-    
-    post:
-      tags:
-        - Meetings
-      description:
-        Create a new user account.
-      requestBody:
-        description: All new user data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./meetings.json#/definitions/meetings
-      responses:
-        '201':
-          description: meetings created
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetings
-
-    put:
-      tags:
-        - Meetings
-      description:
-        Update meetings by id.
-      requestBody:
-        description: Update a visible property or the password.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./meetings.json#/definitions/meetingsUpdate
-      responses:
-        '200':
-          description: Confirmation and link to record.
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetingsUpdated
-        '404':
-          description: Not found
+#     put:
+#       tags:
+#         - Announcement
+#       description:
+#         Update user by id.
+#       requestBody:
+#         description: Update a visible property or the password.
+#         required: true
+#         #content:
+#           #application/json:
+#             #schema:
+#               #$ref: .announcement.json#/definitions/announcementUpdate
+#       responses:
+#         '200':
+#           description: Confirmation and link to record.
+#           #content:
+#             #application/json:
+#               #schema:
+#                 #$ref: ./announcement.json#/definitions/announcementUpdated
+#         '404':
+#           description: Not found
 
 
-examples:
+#   /v2/meetings:
 
-    post:
-      tags:
-        - Meetings
-      description:
-        Create a new user account.
-      requestBody:
-        description: All new user data.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./user.json#/definitions/user
-      responses:
-        '201':
-          description: User created
-          content:
-            application/json:
-              schema:
-                $ref: ./user.json#/definitions/userUpdated
+#     summary: Rappresents Meetings posts on the database
+#     description: >
+#       This resource represents an issue post in the system.
+#       Each post is identified by a numeric `id`.
+#     get:
+#       tags:
+#         - Meetings
+#       description:
+#         Get user by id.
+#       responses:
+#         '200':
+#           description: View of user record
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetings
+#         '401':
+#           description: Non-admin users can only view their own record
+#         '404':
+#           description: Not found
+  
+#     post:
+#       tags:
+#         - Meetings
+#       description:
+#         Create a new user account.
+#       requestBody:
+#         description: All new user data.
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: ./meetings.json#/definitions/meetings
+#       responses:
+#         '201':
+#           description: meetings created
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetings
 
-    get:
-      tags:
-        - Meetings
-      description:
-        Get user by id.
-      responses:
-        '200':
-          description: View of user record
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetingsView
-        '401':
-          description: Non-admin umeetings  can only view their own record
-        '404':
-          description: Not found
+#     put:
+#       tags:
+#         - Meetings
+#       description:
+#         Update meetings by id.
+#       requestBody:
+#         description: Update a visible property or the password.
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: ./meetings.json#/definitions/meetingsUpdate
+#       responses:
+#         '200':
+#           description: Confirmation and link to record.
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetingsUpdated
+#         '404':
+#           description: Not found
 
 
-    put:
-      tags:
-        - Meetings
-      description:
-        Update meetings by id.
-      requestBody:
-        description: Update a visible property or the password.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: ./meetings.json#/definitions/meetingsUpdate
-      responses:
-        '200':
-          description: Confirmation and link to record.
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetingsUpdated
-        '404':
-          description: Not found
+# examples:
+
+#     post:
+#       tags:
+#         - Meetings
+#       description:
+#         Create a new user account.
+#       requestBody:
+#         description: All new user data.
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: ./user.json#/definitions/user
+#       responses:
+#         '201':
+#           description: User created
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./user.json#/definitions/userUpdated
+
+#     get:
+#       tags:
+#         - Meetings
+#       description:
+#         Get user by id.
+#       responses:
+#         '200':
+#           description: View of user record
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetingsView
+#         '401':
+#           description: Non-admin umeetings  can only view their own record
+#         '404':
+#           description: Not found
+
+
+#     put:
+#       tags:
+#         - Meetings
+#       description:
+#         Update meetings by id.
+#       requestBody:
+#         description: Update a visible property or the password.
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               $ref: ./meetings.json#/definitions/meetingsUpdate
+#       responses:
+#         '200':
+#           description: Confirmation and link to record.
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetingsUpdated
+#         '404':
+#           description: Not found
 
           
-    delete:
-      tags:
-        - Meetings
-      description:
-        Delete meetings by id.
-      responses:
-        '200':
-          description: Confirmation of deletion.
-          content:
-            application/json:
-              schema:
-                $ref: ./meetings.json#/definitions/meetingsDeleted
-        '401':
-          description: Only admin meetings can delete accounts
-        '404':
-          description: Not found
+#     delete:
+#       tags:
+#         - Meetings
+#       description:
+#         Delete meetings by id.
+#       responses:
+#         '200':
+#           description: Confirmation of deletion.
+#           content:
+#             application/json:
+#               schema:
+#                 $ref: ./meetings.json#/definitions/meetingsDeleted
+#         '401':
+#           description: Only admin meetings can delete accounts
+#         '404':
+#           description: Not found

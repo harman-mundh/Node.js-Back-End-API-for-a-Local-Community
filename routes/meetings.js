@@ -49,21 +49,36 @@ router.del('/:id([0-9]{1,})/locations', auth, deleteLocation)
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
- async function getAll(ctx) {
-  try {
-    const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
+async function getAll(ctx) {
+  let {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
 
-    const issuesData = await meetings.getAll(page, limit, order, direction);
+  // ensure params are integers
+  limit = parseInt(limit);
+  page = parseInt(page);
+  
+  // validate pagination values to ensure they are sensible
+  limit = limit > 100 ? 100 : limit;
+  limit = limit < 1 ? 10 : limit;
+  page = page < 1 ? 1 : page;
 
-    if (issuesData.length) {
-      ctx.body = issuesData
-    } else {
-      ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
-    }
-  } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all meetings posts from DB. Details: ${error.message}`};
+  // ensure order and direction make sense
+  order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
+  direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
+
+  const result = await meetings.getAll(page, limit, order, direction);
+  if (result.length) {
+    const body = result.map(post => {
+      // extract the post fields we want to send back (summary details)
+      const {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID} = post;
+
+      const links = {
+        views: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}/views`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}`
+      }
+      
+      return {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID, links};
+    });
+    ctx.body = body;
   }
 }
 

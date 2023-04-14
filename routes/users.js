@@ -21,8 +21,8 @@ const commonUserRoutes = function commonUserRoutes (prefix) {
 
   router.get('/', auth, getAll); // check permissions and require authentication 
   router.post('/', bodyParser(), validateUser, createUser);
-  router.get('/:id([0-9]{1,})', auth, getById); 
-  router.get('/:id([a-zA-Z0-9-_]+)', auth, getByUsername);
+  router.get('/user', auth, getById);
+  router.get('/:id([a-zA-Z0-9-_]+)', auth, getByUsername); 
   router.get('/:id([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', auth, getByEmail);
   router.put('/:id([0-9]{1,})', auth, bodyParser(), validateUserUpdate, updateUser);
   router.del('/:id([0-9]{1,})', auth, deleteUser);
@@ -85,7 +85,7 @@ async function getAll(ctx) {
  * @return {object} response - all user details
  */
 async function getById(ctx, next) {
-  const id = ctx.params.id;
+  const id = ctx.query.id;
   const result = await users.getById(id);
   if (result.length) {
     const data = result[0]

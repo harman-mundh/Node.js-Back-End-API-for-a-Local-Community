@@ -6,7 +6,7 @@
       "issue": {
         "$id": "#issue",
         "title": "issue",
-        "description": "An issue in the local community",
+        "description": "An issue post in the local community",
         "type": "object",
         "properties": {
           "title": {
@@ -53,7 +53,8 @@
           },
           "locationID": {
             "description": "location ID of the coordinates",
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": ["title", "allText", "authorID", "locationID"],

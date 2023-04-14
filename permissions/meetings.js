@@ -1,3 +1,11 @@
+/**
+ * A module to set permission on user and admin and actions 
+ * that each role can perfom on route meetings
+ * 
+ * @module permissions/users
+ * @author Harman Singh
+ */
+
 const AccessControl = require('role-acl');
 const ac = new AccessControl();
 
@@ -5,83 +13,47 @@ const ac = new AccessControl();
 // don't let users update the meeting ID or the authorID
 
 // permissions for role 'user'
-ac
-  .grant('user')
-  .execute('read')
-  .on('meetings');
-
-ac
-  .grant('user')
-  .execute('read')
-  .on('meetings');
 
 ac
   .grant('user')
   .condition({Fn:'EQUALS', args: {'requester':'$.owner'}})
   .  execute('update')
-  .on('meetings');
+  .on('meeting');
 
 ac
   .grant('user')
   .condition({Fn:'EQUALS', args: {'requester':'$.owner'}})
-  .execute('update')
-  .on('meetings');
+  .execute('delete')
+  .on('meeting');
 
 // permission of role 'admin
-ac
-  .grant('admin')
-  .execute('create')
-  .on('meetings');
-
-  ac
-  .grant('admin')
-  .execute('read')
-  .on('meetings');
 
   ac
   .grant('admin')
   .execute('update')
-  .on('meetings');
+  .on('meeting');
 
   ac
   .grant('admin')
   .execute('delete')
-  .on('meetings');
-
-exports.create = (requester) => {
-  return ac
-    .can(requester.role)
-    .execute('create')
-    .sync()
-    .on('meetings');
-  }
-
-exports.read = (requester) => {
-  return ac
-    .can(requester.role)
-    .execute('read')
-    .sync()
-    .on('meetings');
-  }
+  .on('meeting');
 
 exports.update = (requester, data) => {
-    console.log(requester)
-    console.log(data)
+
   return ac
     .can(requester.role)
     .context({requester:requester.ID, owner:data.authorID})
     .execute('update')
     .sync()
-    .on('meetings');
+    .on('meeting');
   }
 
 exports.delete = (requester, data) => {
-    console.log(requester)
-    console.log(data)
+
   return ac
     .can(requester.role)
     .context({requester:requester.ID, owner:data.authorID})
     .execute('delete')
     .sync()
-    .on('meetings');
+    .on('meeting');
   }
