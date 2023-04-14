@@ -29,6 +29,7 @@ exports.getGeocodeLatLng = async function getGeocodeLatLng(latitude, longitude, 
         });
         return response.data;
     } catch (error) {
-        throw new Error('Error while attempting to fetch data from geocoding api: ', error);
+        console.error('Error while attempting to fetch data from geocoding api: ', error);
+        return { error: 'Error while attempting to fetch data from geocoding api: '};
     }
 };

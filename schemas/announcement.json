@@ -56,23 +56,60 @@
         },
         "additionalProperties": false     
       },
-      "userList": {
-        "$id": "#userList",
-        "title": "User List",
-        "description": "List of all users visible to admin only.",
+
+      "announcementView": {
+        "$id": "#announcementView",
+        "title": "announcement View",
+        "description": "Data visible to announcement and admins.",
+        "type": "object",
+        "properties": {
+          "title": {
+            "description": "Title of the annoucement",
+            "type": "string"
+          },
+          "allText": {
+            "description": "Content of the announcement",
+            "type": "string"
+          },
+          "authorID": {
+            "description": "author of the post",
+            "type": "string"
+          },
+          "dateCreated": {
+            "description": "Date of when the post was created",
+            "type": "string",
+            "format":"date-time"
+          },
+          "dateModified": {
+            "description": "Date of when the post was modified",
+            "type": "string",
+            "format":"date-time"
+          },
+          "links": {
+            "description": "HATEOAS",
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+
+      "announcementList": {
+        "$id": "#announcementList",
+        "title": "announcement List",
+        "description": "List of all announcement visible to roles.",
         "type": "array",
-        "items": {"$ref": "#/definitions/userView"}
+        "items": {"$ref": "#/definitions/announcementView"}
       },
       
       
-      "annoucementUpdated": {
-        "$id": "#annoucementUpdated",
-        "title": "User Updated",
-        "description": "Confirmation of a successful user update/creation",
+      "announcementUpdated": {
+        "$id": "#announcementUpdated",
+        "title": "Announcement Updated",
+        "description": "Confirmation of a successful Announcement update/creation",
         "type": "object",
         "properties": {
           "ID": {
-            "description": "ID of the updated user record",
+            "description": "ID of the announcement post record",
             "type": "integer"
           },
           "updated": {
@@ -88,14 +125,14 @@
       },
       
       
-      "userDeleted": {
-        "$id": "#userDeleted",
-        "title": "User Deleted",
+      "announcementDeleted": {
+        "$id": "#announcementDeleted",
+        "title": "Announcement Deleted",
         "description": "Confirmation of a successful deletion",
         "type": "object",
         "properties": {
           "ID": {
-            "description": "ID of the updated user record",
+            "description": "ID of the delete announcement record",
             "type": "integer"
           },
           "deleted": {
@@ -105,15 +142,15 @@
         }
       },
 
-      "userNotFound":{
-        "$id": "#userDeleted",
-        "title": "User Deleted",
-        "description": "Confirmation of a successful deletion",
+      "announcementNotFound":{
+        "$id": "#announcement Deleted",
+        "title": "announcement Deleted",
+        "description": "error fail to retrive data",
         "type": "object",
         "properties": {
-          "ID": {
-            "description": "ID of the updated user record",
-            "type": "integer"
+          "error": {
+            "description": "error fail to retrive data",
+            "type": "string"
             }
 
         }

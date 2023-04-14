@@ -53,6 +53,10 @@
         "description": "Data visible to users and admins (excludes password).",
         "type": "object",
         "properties": {
+          "role": {
+            "description": "user role",
+            "type": "string"
+          },
           "firstName": {
             "description": "First name",
             "type": "string"
@@ -61,9 +65,18 @@
             "description": "Last name",
             "type": "string"
           },
+          "username": {
+            "description": "Unique username",
+            "type": "string"
+          },
           "about": {
             "description": "Description of the user",
             "type": "string"
+          },
+          "dateRegistered": {
+            "description":"Date when the user first registered",
+            "type":"string",
+            "format": "date-time"
           },
           "email": {
             "description": "Unique email address",
@@ -71,10 +84,6 @@
           },
           "avatarURL": {
             "description": "URL of avatar image",
-            "type": "string"
-          },
-          "username": {
-            "description": "Unique username",
             "type": "string"
           }
         }
@@ -158,7 +167,7 @@
         "type": "object",
         "properties": {
           "ID": {
-            "description": "ID of the updated user record",
+            "description": "ID of the deleted user record",
             "type": "integer"
           },
           "deleted": {
@@ -169,14 +178,14 @@
       },
 
       "userNotFound":{
-        "$id": "#userDeleted",
-        "title": "User Deleted",
-        "description": "Confirmation of a successful deletion",
+        "$id": "#userNotFound",
+        "title": "User not found",
+        "description": "error fail to retrive data",
         "type": "object",
         "properties": {
-          "ID": {
-            "description": "ID of the updated user record",
-            "type": "integer"
+          "error": {
+            "description": "error fail to retrive data",
+            "type": "string"
             }
 
         }

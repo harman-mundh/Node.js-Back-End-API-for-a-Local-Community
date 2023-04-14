@@ -28,6 +28,6 @@ exports.getCachedAccuData = async function getCachedAccuData() {
  * @return {Promise} data - Console log data saved in table or throws error.
  */
 exports.putResponseAccuData = async function putResponseAccuData(response) {
-    const query = "INSERT INTO weather_cache (data) VALUES ?;";
+    const query = "INSERT INTO weather_cache (data) VALUES (?);";
     await db.run_query(query, [JSON.stringify(response)]);
 }

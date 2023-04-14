@@ -15,10 +15,12 @@ const auth = require('../controllers/authMiddleware');
 const can = require('../permissions/meetings');
 const meetings = require('../models/meetings');
 const meetingsViews = require('../models/meetingsViews');
+
+// third-part API
 const locations = require('../integrations/maps/googleMaps-model');
-const getGeocodeLatLng =  require('../integrations/maps/geocodingGMaps');
+const gmaps =  require('../integrations/maps/geocodingGMaps');
+const { getCovWeather } = require('../integrations/weather/accuWeather');
 const { GmapsAPIkey } = require('../config');
-const {weatherAPIkey, covLocationKey} = require('../config');
 
 // validation schema
 const {validateMeeting, validateMeetingUpdate, validateLocation} = require('../controllers/validationMiddleware');
@@ -28,7 +30,7 @@ const router = Router({prefix: prefix_v2});
 
 // meetings routes
 router.get('/', getAll);
-router.get('/:id([0-9]{1,})', auth, getById);
+router.get('/meet', auth, getById); //:id([0-9]{1,})
 router.post('/', auth, bodyParser(), validateMeeting, createMeeting);
 router.put('/:id([0-9]{1,})', auth, validateMeetingUpdate,bodyParser(), updateMeeting);
 router.del('/:id([0-9]{1,})', auth, deleteMeeting);
@@ -67,6 +69,9 @@ async function getAll(ctx) {
 
   const result = await meetings.getAll(page, limit, order, direction);
   if (result.length) {
+    // fetch weather data from the third part api
+    const weatherData = await getCovWeather();
+
     const body = result.map(post => {
       // extract the post fields we want to send back (summary details)
       const {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID} = post;
@@ -78,7 +83,8 @@ async function getAll(ctx) {
       
       return {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID, links};
     });
-    ctx.body = body;
+    const response = {meetings: body, weatherData}
+    ctx.body = response;
   }
 }
 
@@ -90,34 +96,39 @@ async function getAll(ctx) {
  * @throws {Object} 500 - Internal Server Error
  * @returns {Object} JSON - Meetings post body with attributes
  */
-async function getById(ctx) {
+ async function getById(ctx) {
   try {
-    const id = ctx.params.id;
+    const id = ctx.query.id;
     const result = await meetings.getById(id);
     if (result.length) {
-      await meetingsViews.add(id);// add a record of being viewed
-
+      await meetingsViews.add(id);  // add a record of being viewed
       const meeting = result[0];
-    
-      // get location data
-      const location = await locations.getLocationById(meeting.locationID);
-      if (location.length) {
-      const {latitude, longitude} = location[0];
 
-      // pass to Geocoding api 
-      const geocodingResponse = await getGeocodeLatLng(latitude, longitude, GmapsAPIkey);
+      // fetch data  from locationID
+      const locationsResult = await locations.getById(meeting.locationID);
 
-      issue.geocodingResponse = geocodingResponse;
-    }
+      // call gmaps api
+      const geocodeData =  await gmaps.getGeocodeLatLng(locationsResult[0].latitude, locationsResult[0].longitude, GmapsAPIkey);
 
-      ctx.body = meeting ;
+      const links = {
+        goBack: `${ctx.protocol}://${ctx.host}${prefix_v2}`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${meeting.ID}`,
+        addView: `${ctx.protocol}://${ctx.host}${prefix_v2}/views`
+      }
+
+      ctx.body = {
+        meeting: meeting,
+        address: geocodeData.results[0].formatted_address,
+        links: links
+      };
+
     } else {
       ctx.status = 404;
-      ctx.body = { error: `Error: ${ctx.status} Meeting not found.` };
+      ctx.body = { error: `Error: ${ctx.status} meetings not found.` };
     }
   } catch (error) {
     ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while retrive the meeting post by its ID. Details: ${error.message}` };
+    ctx.body = { error: `Error: ${ctx.status} while trying to retrive the post. Details: ${error.message}` };
   }
 }
 
