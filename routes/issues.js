@@ -20,8 +20,9 @@ const issueViews = require('../models/issuesViews');
 const issueCategories = require('../models/categories'); 
 const comments = require('../models/comments');
 const likes = require('../models/likes');
+// third-part API
 const locations = require('../integrations/maps/googleMaps-model');
-const getGeocodeLatLng =  require('../integrations/maps/geocodingGMaps');
+const gmaps =  require('../integrations/maps/geocodingGMaps');
 const { GmapsAPIkey } = require('../config');
 
 // validation schema
@@ -69,23 +70,6 @@ router.del('/:id([0-9]{1,})/locations', auth, deleteLocation)
  * @throws {Object} 500 - Internal Server Error
  * @returns {Response} JSON - Http respons containing HATEOAS links and message
  */
-// async function getAll(ctx) {
-//   try {
-//     const { page = 1, limit = 10, order = 'dateCreated', direction = 'DESC' } = ctx.request.query;
-
-//     const issuesData = await issues.getAll(page, limit, order, direction);
-//     ctx.body = issuesData;
-//     if (issuesData.length) {
-//       ctx.body = issuesData;
-//     } else {
-//       ctx.status = 404;
-//       ctx.body = { error: `Error: ${ctx.status} No issue posts were found.` };
-//     }
-//   } catch (error) {
-//     ctx.status = 500;
-//     ctx.body = { error: `Error: ${ctx.status} while trying to retrieve all announcements posts from DB. Details: ${error.message}`};
-//   }
-// }
 
 async function getAll(ctx) {
   let {page=1, limit=10, order='dateCreated', direction='DESC'} = ctx.request.query;
@@ -103,17 +87,25 @@ async function getAll(ctx) {
   order = ['dateCreated', 'dateModified'].includes(order) ? order : 'dateCreated';
   direction = ['ASC', 'DESC'].includes(direction) ? direction : 'ASC';
 
-  const result = await meetings.getAll(page, limit, order, direction);
+  const result = await issues.getAll(page, limit, order, direction);
   if (result.length) {
+
     const body = result.map(post => {
       // extract the post fields we want to send back (summary details)
-      const {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID} = post;
+      const {ID, title, allText, summary, status, dateCreated, locationID, authorID} = post;
 
-      return {ID, title, allText, start_time, end_time, locationID, dateCreated, authorID};
+      const links = {
+        views: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}/views`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v2}/${post.ID}`
+      }
+      
+      return {ID, title, allText, summary, dateCreated, locationID, dateCreated, authorID, links};
     });
-    ctx.body = body;
+    const response = {issue: body}
+    ctx.body = response;
   }
 }
+
 
 /**
  * Get a Issue Post by its ID.
@@ -125,31 +117,38 @@ async function getAll(ctx) {
  */
  async function getById(ctx) {
   try {
-    const id = ctx.params.id;
+    const id = ctx.query.id;
     const result = await issues.getById(id);
     if (result.length) {
-      await issueViews.add(id);  // add a record of being viewed
       const issue = result[0];
-  
-      // get location data
-      const location = await locations.getLocationById(issue.locationID);
-      if (location.length) {
-        const {latitude, longitude} = location[0];
-  
-        // pass to Geocoding api 
-        const geocodingResponse = await getGeocodeLatLng(latitude, longitude, GmapsAPIkey);
-  
-        issue.geocodingResponse = geocodingResponse;
+
+      // fetch data  from locationID
+      const locationsResult = await locations.getById(issue.locationID);
+
+      // call gmaps api
+      const geocodeData =  await gmaps.getGeocodeLatLng(locationsResult[0].latitude, locationsResult[0].longitude, GmapsAPIkey);
+
+      const links = {
+        goBack: `${ctx.protocol}://${ctx.host}${prefix_v1}`,
+        self: `${ctx.protocol}://${ctx.host}${prefix_v1}/${issue.ID}`,
+        addView: `${ctx.protocol}://${ctx.host}${prefix_v1}/views`
       }
-      ctx.body = issue;
-      } else {
-        ctx.status = 404;
-        ctx.body = { error: `Error: ${ctx.status} Issue not found.` };
-      }
-    } catch (error) {
-      ctx.body = { error: `Error: ${ctx.status} while trying to get post by ID. Details: ${error.message}` };
+
+      ctx.body = {
+        Issue: issue,
+        address: geocodeData.results[0].formatted_address,
+        links: links
+      };
+
+    } else {
+      ctx.status = 404;
+      ctx.body = { error: `Error: ${ctx.status} issue not found.` };
     }
+  } catch (error) {
+    ctx.status = 500;
+    ctx.body = { error: `Error: ${ctx.status} while trying to retrive the post. Details: ${error.message}` };
   }
+}
 
 /**
  * Update an existing Issue Post by its ID.
@@ -512,14 +511,14 @@ function addCommentIds(ctx, next) {
 }
 
 /**
- * Get Locations for the Issue Post by its ID. 
+ * Get Locations for the meeting Post by its ID. 
  * 
  * @param {Object} ctx - Koa context object
  * @throws {Object} 404 - Not found
  * @throws {Object} 500 - Internal Server Error
- * @returns {Object} JSON - Location related to the issue post
+ * @returns {Object} JSON - Location related to the meeting post
  */
-async function getLocationById() {
+ async function getLocationById(ctx) {
   try{
     const id = ctx.params.id;
     const result = await locations.getById(id);
@@ -527,13 +526,13 @@ async function getLocationById() {
       ctx.body = result;
       } else {
         ctx.status = 404;
-        ctx.body = { error: `Error: ${ctx.status} No Locations were found for this issue post.` };
+        ctx.body = { error: `Error: ${ctx.status} No Locations were found for this meeting post.` };
       }
     } catch (error) {
       ctx.body = { error: `Error: ${ctx.status} while trying to retrive locations data for the post. Details: ${error.message}`};
     }
   }
-  
+
 /**
  * Add a category to a Issue Post.  
  * 

@@ -141,21 +141,13 @@ async function getAll(ctx) {
  * @returns {Object} 201 - Success response
  */
 async function createMeeting(ctx) {
-  try {
-    const body = ctx.request.body; // bodyParser
-    const result = await meetings.add(body);
-    if (result.affectedRows) {
-      const id = result.insertId;
-      ctx.status = 201;
-      ctx.body = {ID: id, created: true, link: `${ctx.request.path}/${id}`};
-    } else {
-      ctx.status = 400;
-      ctx.body = { error: `Error: ${ctx.status} meetings post failed to create.` };
-    }
-  } catch (error) {
-    ctx.status = 500;
-    ctx.body = { error: `Error: ${ctx.status} while trying to create the post. Details: ${error.message}` };
-  }
+  const body = ctx.request.body;
+  const result = await meetings.add(body);
+  if (result.affectedRows) {
+    const id = result.insertId;
+    ctx.status = 201;
+    ctx.body = {ID: id, created: true, link: `${ctx.request.path}/${id}`};
+  } 
 }
 
 /**
@@ -185,7 +177,7 @@ async function updateMeeting(ctx) {
           ctx.body = {ID: id, updated: true, link: ctx.request.path};
         } else {
           ctx.status = 400;
-          ctx.body = { error: `Error: ${ctx.status} Failed to update the update.` };
+          ctx.body = { error: `Error: ${ctx.status} Failed to update the meeting.` };
         }
       }
     } else {

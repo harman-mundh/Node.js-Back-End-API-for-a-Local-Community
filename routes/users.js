@@ -120,7 +120,7 @@ async function getById(ctx, next) {
 }
 
 /**
- * Get a user by their ID.
+ * Get a user by the username.
  * 
  * @param {Object} ctx - Koa context object
  * @param {Function} next - Koa next middleware
@@ -216,7 +216,7 @@ async function createUser(ctx) {
     const id = result.insertId;
     ctx.status = 201;
     ctx.body = {ID: id, created: true, link: `${ctx.request.path}/${id}`};
-  }
+  } 
 }
 
 /**

@@ -15,66 +15,16 @@ servers:
   - url: 'https://outsidefilter-epoxyderby-3000.codio-box.uk/api/v2'
     description: Development server (v2)
 tags:
-  - name: Root
-    description: API endpoints for testing versioning and Auth
   - name: Users
     description: API endpoints for user management.
   - name: Issues
     description: API endpoint to perform CRUD operations on issues entries.
-  - name: Comments
-    description: API endpoint to perform CRUD operations on comments entries
-  - name: Categories
-    description: API endpoint to perform CRUD operations on categories entries
   - name: Announcements
     description: API endpoint to perform CRUD operations on announcement entries.
   - name: Meetings
     description: API endpoint to perform CRUD operations on meeting entries.
 
 paths:
-  /api/v1:
-    summary:
-    description: >
-      This resource represents the basic API endpoints used to test the versioning 
-      and to view data with and without any Authenctication
-    get:
-      tags:
-        - api/v1
-      description:
-        Get response from the api/v1.
-      responses:
-        '200':
-          description: View of user record
-
-  /api/v2:
-    get:
-      tags:
-        - api/v2
-      description:
-        Get response from the api/v2.
-      responses:
-        '200':
-          description: Show api public message
-
-  /api/v1/private:
-    get:
-      tags:
-        - api/v1/private
-      description:
-        Get response from the api/v1/private.
-      responses:
-        '200':
-          description: Show api private message only available after Auth
-
-  /api/v2/private:
-    get:
-      tags:
-        - api/v2/private
-      description:
-        Get response from the api/v2/private.
-      responses:
-        '200':
-          description: Show api private message only available after Auth
-
   /users:
     summary: Represents an individual user
     description: >
@@ -267,6 +217,7 @@ paths:
   #       '404':
   #         description: Not found
 
+
   /v2/announcements/{id}:
     parameters:
       - in: path
@@ -378,7 +329,6 @@ paths:
           description: Not found
 
   # /v2/meetings:
-
   #   summary: Rappresents Meetings posts on the database
   #   description: >
   #     This resource represents an issue post in the system.
